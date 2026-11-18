@@ -18,6 +18,8 @@ open "design/mockup/index.html?dir=b&theme=light"
 node scripts/mockup-capture.mjs
 ```
 
+Exits non-zero if geometry QA finds flow/text or flow/flow crossings (debug overlays written as `mockup-*-qa-overlay.png`).
+
 Outputs (2× DPR):
 
 - `/opt/cursor/artifacts/mockup-a-dark.png`

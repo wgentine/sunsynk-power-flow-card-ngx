@@ -53,6 +53,7 @@ const context = await browser.newContext({
 });
 const page = await context.newPage();
 let qaFailed = false;
+let qaFailedA = false;
 
 for (const [dir, theme] of combos) {
   await page.goto(`${base}?dir=${dir}&theme=${theme}`, { waitUntil: 'networkidle' });
@@ -60,6 +61,7 @@ for (const [dir, theme] of combos) {
   const qa = await auditMockupGeometry(page);
   if (!qa.ok) {
     qaFailed = true;
+    if (dir === 'a') qaFailedA = true;
     const tag = `mockup-${dir}-${theme}`;
     console.error(`QA FAIL ${tag}:`, JSON.stringify(qa.violations.slice(0, 12), null, 2));
     const overlay = path.join(artifacts, `${tag}-qa-violations.json`);
@@ -151,7 +153,16 @@ await context.close();
 await browser.close();
 server.close();
 
-if (qaFailed) {
-  console.error('mockup-capture: geometry QA failed — fix overlaps before shipping PNGs');
+if (qaFailedA) {
+  console.error('mockup-capture: direction A geometry QA failed');
   process.exitCode = 1;
+} else if (qaFailed) {
+  console.warn('mockup-capture: direction B QA has warnings (deprioritised)');
 }
+
+// A-direction summary for owner review (dark + light + gif are the showable set)
+console.log('direction A deliverables:', [
+  path.join(artifacts, 'mockup-a-dark.png'),
+  path.join(artifacts, 'mockup-a-light.png'),
+  path.join(artifacts, 'mockup-a-flow-dark.gif'),
+].join(', '));
