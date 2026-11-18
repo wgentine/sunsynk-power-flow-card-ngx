@@ -26,6 +26,8 @@ export const renderLoadElements = (
 		dynamicColourEssentialLoad4,
 		dynamicColourEssentialLoad5,
 		dynamicColourEssentialLoad6,
+		dynamicColourEssentialLoad7,
+		dynamicColourEssentialLoad8,
 		decimalPlaces,
 		loadColour,
 		flowColour,
@@ -48,8 +50,29 @@ export const renderLoadElements = (
 		load5_switch,
 		load6_name,
 		load6_switch,
+		load7_name,
+		load7_switch,
+		load8_name,
+		load8_switch,
 		dynamic_colour,
 	} = config.load;
+
+	const showCompactSideLoads =
+		config.wide || (!config.wide && [1, 2, 3].includes(config.solar.mppts))
+			? 'inline'
+			: 'none';
+	const stackLoads78 = config.load.loads_7_8_layout === 'stack-right';
+	const compactSideOffset = config.wide
+		? '-5%'
+		: stackLoads78
+			? '-7.35%'
+			: '-12%';
+	const compactLoad7Pos = stackLoads78
+		? { rx: 405, ry: 198, tx: 437, ty: 227, px: 412, py: 172, vy: 209 }
+		: { rx: 368, ry: 107, tx: 400, ty: 136, px: 375, py: 81, vy: 118 };
+	const compactLoad8Pos = stackLoads78
+		? { rx: 405, ry: 244, tx: 437, ty: 273, px: 412, py: 218, vy: 255 }
+		: { rx: 368, ry: 290, tx: 400, ty: 320, px: 375, py: 264, vy: 301 };
 
 	return html`
 		<!-- Load Elements -->
@@ -115,7 +138,7 @@ export const renderLoadElements = (
 					(e) => Utils.handlePopup(e, config.entities.essential_load1_extra),
 				)}
 				<g
-					display="${[0, 4, 5, 6].includes(additionalLoad) ? 'none' : 'inline'}"
+					display="${[0, 4, 5, 6, 7, 8].includes(additionalLoad) ? 'none' : 'inline'}"
 				>
 					${renderIcon(
 						load1_switch,
@@ -526,12 +549,9 @@ export const renderLoadElements = (
 			</svg>
 			<svg
 				id="Esential-Load5"
-				style="overflow: visible; display: ${[5, 6].includes(additionalLoad)
-					? config.wide ||
-						(!config.wide && [1, 2, 3].includes(config.solar.mppts))
-						? 'inline'
-						: 'none'
-					: `none`};"
+				style="overflow: visible; display: ${
+					additionalLoad >= 5 ? showCompactSideLoads : 'none'
+				};"
 				x="${config.wide ? '-5%' : '-7.35%'}"
 			>
 				<rect
@@ -545,18 +565,18 @@ export const renderLoadElements = (
 					fill="none"
 					stroke="${data.dynamicColourEssentialLoad5}"
 					pointer-events="all"
-					display="${[5, 6].includes(additionalLoad) ? 'inline' : 'none'}"
+					display="${additionalLoad >= 5 ? 'inline' : 'none'}"
 				/>
 				${renderText(
 					'es-load5',
 					437,
 					136,
-					[5, 6].includes(additionalLoad),
+					additionalLoad >= 5,
 					'st3 st8 right-align',
 					dynamicColourEssentialLoad5,
 					load5_name,
 				)}
-				<g display="${[5, 6].includes(additionalLoad) ? 'inline' : 'none'}">
+				<g display="${additionalLoad >= 5 ? 'inline' : 'none'}">
 					${renderIcon(
 						load5_switch,
 						data.iconEssentialLoad5,
@@ -570,7 +590,7 @@ export const renderLoadElements = (
 					437,
 					147,
 					!!config.entities?.essential_load5_extra &&
-						[5, 6].includes(additionalLoad) &&
+						additionalLoad >= 5 &&
 						data.stateEssentialLoad5Extra.isValid(),
 					'st3 right-align',
 					dynamicColourEssentialLoad5,
@@ -584,7 +604,7 @@ export const renderLoadElements = (
 					'ess_load5',
 					423,
 					118,
-					[5, 6].includes(additionalLoad) && data.stateEssentialLoad5.isValid(),
+					additionalLoad >= 5 && data.stateEssentialLoad5.isValid(),
 					'st3',
 					dynamicColourEssentialLoad5,
 					data.stateEssentialLoad5?.toPowerString(auto_scale, decimalPlaces),
@@ -593,12 +613,9 @@ export const renderLoadElements = (
 			</svg>
 			<svg
 				id="Esential-Load6"
-				style="overflow: visible; display: ${[6].includes(additionalLoad)
-					? config.wide ||
-						(!config.wide && [1, 2, 3].includes(config.solar.mppts))
-						? 'inline'
-						: 'none'
-					: `none`};"
+				style="overflow: visible; display: ${
+					additionalLoad >= 6 ? showCompactSideLoads : 'none'
+				};"
 				x="${config.wide ? '-5%' : '-7.35%'}"
 			>
 				<rect
@@ -612,18 +629,18 @@ export const renderLoadElements = (
 					fill="none"
 					stroke="${data.dynamicColourEssentialLoad6}"
 					pointer-events="all"
-					display="${additionalLoad === 6 ? 'inline' : 'none'}"
+					display="${additionalLoad >= 6 ? 'inline' : 'none'}"
 				/>
 				${renderText(
 					'es-load6',
 					437,
 					320,
-					additionalLoad === 6,
+					additionalLoad >= 6,
 					'st3 st8 right-align',
 					dynamicColourEssentialLoad6,
 					load6_name,
 				)}
-				<g display="${additionalLoad === 6 ? 'inline' : 'none'}">
+				<g display="${additionalLoad >= 6 ? 'inline' : 'none'}">
 					${renderIcon(
 						load6_switch,
 						data.iconEssentialLoad6,
@@ -637,7 +654,7 @@ export const renderLoadElements = (
 					437,
 					332,
 					!!config.entities?.essential_load6_extra &&
-						additionalLoad === 6 &&
+						additionalLoad >= 6 &&
 						data.stateEssentialLoad6Extra.isValid(),
 					'st3 right-align',
 					dynamicColourEssentialLoad6,
@@ -651,17 +668,145 @@ export const renderLoadElements = (
 					'ess_load6',
 					423,
 					301,
-					additionalLoad === 6 && data.stateEssentialLoad6.isValid(),
+					additionalLoad >= 6 && data.stateEssentialLoad6.isValid(),
 					'st3',
 					dynamicColourEssentialLoad6,
 					data.stateEssentialLoad6?.toPowerString(auto_scale, decimalPlaces),
 					(e) => Utils.handlePopup(e, config.entities.essential_load6),
 				)}
 			</svg>
+			<svg
+				id="Esential-Load7"
+				style="overflow: visible; display: ${
+					additionalLoad >= 7 ? showCompactSideLoads : 'none'
+				};"
+				x="${compactSideOffset}"
+			>
+				<rect
+					id="es-load7"
+					x="${compactLoad7Pos.rx}"
+					y="${compactLoad7Pos.ry}"
+					width="35"
+					height="20"
+					rx="4.5"
+					ry="4.5"
+					fill="none"
+					stroke="${data.dynamicColourEssentialLoad7}"
+					pointer-events="all"
+					display="${additionalLoad >= 7 ? 'inline' : 'none'}"
+				/>
+				${renderText(
+					'es-load7',
+					compactLoad7Pos.tx,
+					compactLoad7Pos.ty,
+					additionalLoad >= 7,
+					'st3 st8 right-align',
+					dynamicColourEssentialLoad7,
+					load7_name,
+				)}
+				<g display="${additionalLoad >= 7 ? 'inline' : 'none'}">
+					${renderIcon(
+						load7_switch,
+						data.iconEssentialLoad7,
+						'essload7-small-icon',
+						compactLoad7Pos.px,
+						compactLoad7Pos.py,
+					)}
+				</g>
+				${createTextWithPopup(
+					'ess_load7_extra',
+					compactLoad7Pos.tx,
+					compactLoad7Pos.ty + 11,
+					!!config.entities?.essential_load7_extra &&
+						additionalLoad >= 7 &&
+						data.stateEssentialLoad7Extra.isValid(),
+					'st3 right-align',
+					dynamicColourEssentialLoad7,
+					`${Utils.formatNumberLocale(
+						data.stateEssentialLoad7Extra.toNum(1),
+						1,
+					)} ${data.stateEssentialLoad7Extra?.getUOM()}`,
+					(e) => Utils.handlePopup(e, config.entities.essential_load7_extra),
+				)}
+				${createTextWithPopup(
+					'ess_load7',
+					compactLoad7Pos.px + 11,
+					compactLoad7Pos.vy,
+					additionalLoad >= 7 && data.stateEssentialLoad7.isValid(),
+					'st3',
+					dynamicColourEssentialLoad7,
+					data.stateEssentialLoad7?.toPowerString(auto_scale, decimalPlaces),
+					(e) => Utils.handlePopup(e, config.entities.essential_load7),
+				)}
+			</svg>
+			<svg
+				id="Esential-Load8"
+				style="overflow: visible; display: ${
+					additionalLoad >= 8 ? showCompactSideLoads : 'none'
+				};"
+				x="${compactSideOffset}"
+			>
+				<rect
+					id="es-load8"
+					x="${compactLoad8Pos.rx}"
+					y="${compactLoad8Pos.ry}"
+					width="35"
+					height="20"
+					rx="4.5"
+					ry="4.5"
+					fill="none"
+					stroke="${data.dynamicColourEssentialLoad8}"
+					pointer-events="all"
+					display="${additionalLoad >= 8 ? 'inline' : 'none'}"
+				/>
+				${renderText(
+					'es-load8',
+					compactLoad8Pos.tx,
+					compactLoad8Pos.ty,
+					additionalLoad >= 8,
+					'st3 st8 right-align',
+					dynamicColourEssentialLoad8,
+					load8_name,
+				)}
+				<g display="${additionalLoad >= 8 ? 'inline' : 'none'}">
+					${renderIcon(
+						load8_switch,
+						data.iconEssentialLoad8,
+						'essload8-small-icon',
+						compactLoad8Pos.px,
+						compactLoad8Pos.py,
+					)}
+				</g>
+				${createTextWithPopup(
+					'ess_load8_extra',
+					compactLoad8Pos.tx,
+					compactLoad8Pos.ty + 12,
+					!!config.entities?.essential_load8_extra &&
+						additionalLoad >= 8 &&
+						data.stateEssentialLoad8Extra.isValid(),
+					'st3 right-align',
+					dynamicColourEssentialLoad8,
+					`${Utils.formatNumberLocale(
+						data.stateEssentialLoad8Extra.toNum(1),
+						1,
+					)} ${data.stateEssentialLoad8Extra?.getUOM()}`,
+					(e) => Utils.handlePopup(e, config.entities.essential_load8_extra),
+				)}
+				${createTextWithPopup(
+					'ess_load8',
+					compactLoad8Pos.px + 11,
+					compactLoad8Pos.vy,
+					additionalLoad >= 8 && data.stateEssentialLoad8.isValid(),
+					'st3',
+					dynamicColourEssentialLoad8,
+					data.stateEssentialLoad8?.toPowerString(auto_scale, decimalPlaces),
+					(e) => Utils.handlePopup(e, config.entities.essential_load8),
+				)}
+			</svg>
 			${renderText(
 				'daily_load',
-				[2, 3, 4, 5, 6].includes(additionalLoad) ? '365' : '412',
-				[2, 3, 4, 5, 6].includes(additionalLoad) ? '189' : '282.1',
+				[2, 3, 4, 5, 6, 7, 8].includes(additionalLoad) ? '365' : '412',
+				[2, 3, 4, 5, 6, 7, 8].includes(additionalLoad) ? '189' : '282.1',
 				!data.loadShowDaily,
 				'st3 left-align',
 				loadColour,
@@ -687,8 +832,9 @@ export const renderLoadElements = (
 						}${auto_scale ? '' : ` ${UnitOfPower.WATT}`}`
 					: '0',
 			)}
-			${config.inverter.three_phase && config.entities?.load_power_L1
-				? svg`<a
+			${
+				config.inverter.three_phase && config.entities?.load_power_L1
+					? svg`<a
 							href="#"
 							@click=${(e: Event) => Utils.handlePopup(e, config.entities.load_power_L1)}
 						>
@@ -701,9 +847,11 @@ export const renderLoadElements = (
 								pointer-events="all"
 							/>
 						</a>`
-				: ''}
-			${config.inverter.three_phase && config.entities?.load_power_L2
-				? svg`<a
+					: ''
+			}
+			${
+				config.inverter.three_phase && config.entities?.load_power_L2
+					? svg`<a
 							href="#"
 							@click=${(e: Event) => Utils.handlePopup(e, config.entities.load_power_L2)}
 						>
@@ -716,9 +864,11 @@ export const renderLoadElements = (
 								pointer-events="all"
 							/>
 						</a>`
-				: ''}
-			${config.inverter.three_phase && config.entities?.load_power_L3
-				? svg`<a
+					: ''
+			}
+			${
+				config.inverter.three_phase && config.entities?.load_power_L3
+					? svg`<a
 							href="#"
 							@click=${(e: Event) => Utils.handlePopup(e, config.entities.load_power_L3)}
 						>
@@ -731,7 +881,8 @@ export const renderLoadElements = (
 								pointer-events="all"
 							/>
 						</a>`
-				: ''}
+					: ''
+			}
 			<svg id="load-flow">
 				${renderPath(
 					'es-line',
@@ -816,22 +967,24 @@ export const renderLoadElements = (
 			${renderPath(
 				'es-load1',
 				'M 441 180 L 441 147',
-				[2, 3, 4, 5, 6].includes(additionalLoad),
+				[2, 3, 4, 5, 6, 7, 8].includes(additionalLoad),
 				data.load1Colour,
 				1,
 			)}
 			${renderPath(
 				'es-load2',
 				'M 441 290 L 441 257',
-				[2, 3, 4, 5, 6].includes(additionalLoad),
+				[2, 3, 4, 5, 6, 7, 8].includes(additionalLoad),
 				data.load2Colour,
 				1,
 			)}
 			<a
 				href="#"
-				@click=${config.load?.navigate
-					? (e) => Utils.handleNavigation(e, config.load.navigate)
-					: null}
+				@click=${
+					config.load?.navigate
+						? (e) => Utils.handleNavigation(e, config.load.navigate)
+						: null
+				}
 			>
 				<svg
 					id="essen"
@@ -851,31 +1004,35 @@ export const renderLoadElements = (
 						>
 							<stop
 								offset="0%"
-								stop-color="${data.gridPercentage > 0
-									? data.gridColour
-									: data.batteryPercentage > 0
-										? batteryColour
-										: solarColour}"
+								stop-color="${
+									data.gridPercentage > 0
+										? data.gridColour
+										: data.batteryPercentage > 0
+											? batteryColour
+											: solarColour
+								}"
 							/>
 							<stop
 								offset="${data.gridPercentage}%"
-								stop-color="${data.gridPercentage > 0
-									? data.gridColour
-									: data.batteryPercentage > 0
-										? batteryColour
-										: solarColour}"
+								stop-color="${
+									data.gridPercentage > 0
+										? data.gridColour
+										: data.batteryPercentage > 0
+											? batteryColour
+											: solarColour
+								}"
 							/>
 							<stop
 								offset="${data.gridPercentage}%"
-								stop-color="${data.batteryPercentage > 0
-									? batteryColour
-									: solarColour}"
+								stop-color="${
+									data.batteryPercentage > 0 ? batteryColour : solarColour
+								}"
 							/>
 							<stop
 								offset="${data.gridPercentage + data.batteryPercentage}%"
-								stop-color="${data.batteryPercentage > 0
-									? batteryColour
-									: solarColour}"
+								stop-color="${
+									data.batteryPercentage > 0 ? batteryColour : solarColour
+								}"
 							/>
 							<stop
 								offset="${data.gridPercentage + data.batteryPercentage}%"
@@ -892,8 +1049,8 @@ export const renderLoadElements = (
 			</a>
 			${createTextWithPopup(
 				'daily_load_value',
-				[2, 3, 4, 5, 6].includes(additionalLoad) ? '365' : '412',
-				[2, 3, 4, 5, 6].includes(additionalLoad) ? '175' : '267.9',
+				[2, 3, 4, 5, 6, 7, 8].includes(additionalLoad) ? '365' : '412',
+				[2, 3, 4, 5, 6, 7, 8].includes(additionalLoad) ? '175' : '267.9',
 				!data.loadShowDaily || !data.stateDayLoadEnergy.isValid(),
 				'st10 left-align',
 				loadColour,
@@ -901,9 +1058,10 @@ export const renderLoadElements = (
 				(e) => Utils.handlePopup(e, config.entities.day_load_energy_84),
 				true,
 			)}
-			${config.entities?.essential_power &&
-			config.entities.essential_power !== 'none'
-				? svg`
+			${
+				config.entities?.essential_power &&
+				config.entities.essential_power !== 'none'
+					? svg`
                     ${createTextWithPopup(
 											'ess_power',
 											340.1,
@@ -917,7 +1075,7 @@ export const renderLoadElements = (
 											(e) =>
 												Utils.handlePopup(e, config.entities.essential_power),
 										)}`
-				: svg`
+					: svg`
                     ${renderText(
 											'ess_power',
 											340.1,
@@ -928,7 +1086,8 @@ export const renderLoadElements = (
 											auto_scale
 												? `${Utils.convertValue(essentialPower, decimalPlaces) || 0}`
 												: `${essentialPower || 0} ${UnitOfPower.WATT}`,
-										)}`}
+										)}`
+			}
 			${guard(
 				[
 					data.additionalLoad,

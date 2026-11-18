@@ -120,6 +120,8 @@ export default {
 		load4_name: '',
 		load5_name: '',
 		load6_name: '',
+		load7_name: '',
+		load8_name: '',
 		auto_scale: true,
 		path_threshold: 100,
 		navigate: '',

@@ -36,10 +36,10 @@ export const getFullLayoutIconConfigs = (data: DataDto): LoadIconConfig[] => [
 		width: 24,
 		height: 24,
 		loadNumber: 1,
-		displayCondition: [2, 4, 5, 6].includes(data.additionalLoad),
+		displayCondition: [2, 4, 5, 6, 7, 8].includes(data.additionalLoad),
 		opacityCondition:
 			data.iconEssentialLoad1 === 'boiler' &&
-			[2, 4, 5, 6].includes(data.additionalLoad) &&
+			[2, 4, 5, 6, 7, 8].includes(data.additionalLoad) &&
 			!data.showAux,
 		iconType: 'boiler' as const,
 		prefix: 'ess',
@@ -51,10 +51,10 @@ export const getFullLayoutIconConfigs = (data: DataDto): LoadIconConfig[] => [
 		width: 24,
 		height: 24,
 		loadNumber: 2,
-		displayCondition: [2, 4, 5, 6].includes(data.additionalLoad),
+		displayCondition: [2, 4, 5, 6, 7, 8].includes(data.additionalLoad),
 		opacityCondition:
 			data.iconEssentialLoad2 === 'boiler' &&
-			[2, 4, 5, 6].includes(data.additionalLoad) &&
+			[2, 4, 5, 6, 7, 8].includes(data.additionalLoad) &&
 			!data.showAux,
 		iconType: 'boiler' as const,
 		prefix: 'ess',
@@ -112,7 +112,7 @@ export const getFullLayoutIconConfigs = (data: DataDto): LoadIconConfig[] => [
 		displayCondition: data.showAux && [2].includes(data.additionalLoad),
 		opacityCondition:
 			data.iconEssentialLoad2 === 'aircon' &&
-			[2, 3, 4, 5, 6].includes(data.additionalLoad),
+			[2, 3, 4, 5, 6, 7, 8].includes(data.additionalLoad),
 		iconType: 'aircon' as const,
 		prefix: 'ess',
 	},
@@ -123,10 +123,10 @@ export const getFullLayoutIconConfigs = (data: DataDto): LoadIconConfig[] => [
 		width: 20,
 		height: 20,
 		loadNumber: 1,
-		displayCondition: [2, 4, 5, 6].includes(data.additionalLoad),
+		displayCondition: [2, 4, 5, 6, 7, 8].includes(data.additionalLoad),
 		opacityCondition:
 			data.iconEssentialLoad1 === 'aircon' &&
-			[2, 4, 5, 6].includes(data.additionalLoad) &&
+			[2, 4, 5, 6, 7, 8].includes(data.additionalLoad) &&
 			!data.showAux,
 		iconType: 'aircon' as const,
 		prefix: 'ess',
@@ -138,10 +138,10 @@ export const getFullLayoutIconConfigs = (data: DataDto): LoadIconConfig[] => [
 		width: 20,
 		height: 20,
 		loadNumber: 2,
-		displayCondition: [2, 4, 5, 6].includes(data.additionalLoad),
+		displayCondition: [2, 4, 5, 6, 7, 8].includes(data.additionalLoad),
 		opacityCondition:
 			data.iconEssentialLoad2 === 'aircon' &&
-			[2, 4, 5, 6].includes(data.additionalLoad) &&
+			[2, 4, 5, 6, 7, 8].includes(data.additionalLoad) &&
 			!data.showAux,
 		iconType: 'aircon' as const,
 		prefix: 'ess',
@@ -209,10 +209,10 @@ export const getFullLayoutIconConfigs = (data: DataDto): LoadIconConfig[] => [
 		width: 20,
 		height: 25,
 		loadNumber: 1,
-		displayCondition: [2, 4, 5, 6].includes(data.additionalLoad),
+		displayCondition: [2, 4, 5, 6, 7, 8].includes(data.additionalLoad),
 		opacityCondition:
 			data.iconEssentialLoad1 === 'pump' &&
-			[2, 4, 5, 6].includes(data.additionalLoad) &&
+			[2, 4, 5, 6, 7, 8].includes(data.additionalLoad) &&
 			!data.showAux,
 		iconType: 'pump' as const,
 		prefix: 'ess',
@@ -224,10 +224,10 @@ export const getFullLayoutIconConfigs = (data: DataDto): LoadIconConfig[] => [
 		width: 20,
 		height: 25,
 		loadNumber: 2,
-		displayCondition: [2, 4, 5, 6].includes(data.additionalLoad),
+		displayCondition: [2, 4, 5, 6, 7, 8].includes(data.additionalLoad),
 		opacityCondition:
 			data.iconEssentialLoad2 === 'pump' &&
-			[2, 4, 5, 6].includes(data.additionalLoad) &&
+			[2, 4, 5, 6, 7, 8].includes(data.additionalLoad) &&
 			!data.showAux,
 		iconType: 'pump' as const,
 		prefix: 'ess',
@@ -297,10 +297,10 @@ export const getFullLayoutIconConfigs = (data: DataDto): LoadIconConfig[] => [
 		width: 24,
 		height: 24,
 		loadNumber: 1,
-		displayCondition: [2, 4, 5, 6].includes(data.additionalLoad),
+		displayCondition: [2, 4, 5, 6, 7, 8].includes(data.additionalLoad),
 		opacityCondition:
 			data.iconEssentialLoad1 === 'oven' &&
-			[2, 4, 5, 6].includes(data.additionalLoad) &&
+			[2, 4, 5, 6, 7, 8].includes(data.additionalLoad) &&
 			!data.showAux,
 		iconType: 'oven' as const,
 		prefix: 'ess',
@@ -313,10 +313,10 @@ export const getFullLayoutIconConfigs = (data: DataDto): LoadIconConfig[] => [
 		width: 24,
 		height: 24,
 		loadNumber: 2,
-		displayCondition: [2, 4, 5, 6].includes(data.additionalLoad),
+		displayCondition: [2, 4, 5, 6, 7, 8].includes(data.additionalLoad),
 		opacityCondition:
 			data.iconEssentialLoad2 === 'oven' &&
-			[2, 4, 5, 6].includes(data.additionalLoad) &&
+			[2, 4, 5, 6, 7, 8].includes(data.additionalLoad) &&
 			!data.showAux,
 		iconType: 'oven' as const,
 		prefix: 'ess',

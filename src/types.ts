@@ -183,6 +183,8 @@ export interface sunsynkPowerFlowCardConfig extends LovelaceCardConfig {
 		load4_max_threshold: number;
 		load5_max_threshold: number;
 		load6_max_threshold: number;
+		load7_max_threshold: number;
+		load8_max_threshold: number;
 		max_colour: string;
 		additional_loads: number;
 		aux_loads: number;
@@ -196,18 +198,24 @@ export interface sunsynkPowerFlowCardConfig extends LovelaceCardConfig {
 		load4_name: string;
 		load5_name: string;
 		load6_name: string;
+		load7_name: string;
+		load8_name: string;
 		load1_switch: string;
 		load2_switch: string;
 		load3_switch: string;
 		load4_switch: string;
 		load5_switch: string;
 		load6_switch: string;
+		load7_switch: string;
+		load8_switch: string;
 		load1_icon: string;
 		load2_icon: string;
 		load3_icon: string;
 		load4_icon: string;
 		load5_icon: string;
 		load6_icon: string;
+		load7_icon: string;
+		load8_icon: string;
 		show_aux: boolean;
 		show_daily_aux: boolean;
 		auto_scale: boolean;
@@ -216,6 +224,8 @@ export interface sunsynkPowerFlowCardConfig extends LovelaceCardConfig {
 		navigate: string;
 		invert_flow: boolean;
 		label_daily_load: string;
+		/** Layout for essential loads 7–8 when additional_loads is 7 or 8 (review / preview). */
+		loads_7_8_layout?: 'pair-row' | 'stack-right';
 	};
 	grid: {
 		colour: string;
@@ -323,6 +333,8 @@ export interface CardConfigEntities {
 	essential_load4: string;
 	essential_load5: string;
 	essential_load6: string;
+	essential_load7: string;
+	essential_load8: string;
 	energy_cost_buy: string;
 	solar_sell_247: string;
 	battery_status: string;
@@ -341,6 +353,8 @@ export interface CardConfigEntities {
 	essential_load4_extra: string;
 	essential_load5_extra: string;
 	essential_load6_extra: string;
+	essential_load7_extra: string;
+	essential_load8_extra: string;
 	inverter_voltage_L2: string;
 	inverter_voltage_L3: string;
 	inverter_current_L2: string;
@@ -490,6 +504,8 @@ export interface DataDto {
 	iconEssentialLoad4;
 	iconEssentialLoad5;
 	iconEssentialLoad6;
+	iconEssentialLoad7;
+	iconEssentialLoad8;
 	enableTimer;
 	priorityLoad;
 	inverterImg;
@@ -549,12 +565,16 @@ export interface DataDto {
 	stateEssentialLoad4: CustomEntity;
 	stateEssentialLoad5: CustomEntity;
 	stateEssentialLoad6: CustomEntity;
+	stateEssentialLoad7: CustomEntity;
+	stateEssentialLoad8: CustomEntity;
 	stateEssentialLoad1Extra: CustomEntity;
 	stateEssentialLoad2Extra: CustomEntity;
 	stateEssentialLoad3Extra: CustomEntity;
 	stateEssentialLoad4Extra: CustomEntity;
 	stateEssentialLoad5Extra: CustomEntity;
 	stateEssentialLoad6Extra: CustomEntity;
+	stateEssentialLoad7Extra: CustomEntity;
+	stateEssentialLoad8Extra: CustomEntity;
 	stateNonEssentialLoad1Extra: CustomEntity;
 	stateNonEssentialLoad2Extra: CustomEntity;
 	stateNonEssentialLoad3Extra: CustomEntity;
@@ -611,6 +631,8 @@ export interface DataDto {
 	dynamicColourEssentialLoad4;
 	dynamicColourEssentialLoad5;
 	dynamicColourEssentialLoad6;
+	dynamicColourEssentialLoad7;
+	dynamicColourEssentialLoad8;
 	dynamicColourNonEssentialLoad1;
 	dynamicColourNonEssentialLoad2;
 	dynamicColourNonEssentialLoad3;

@@ -27,6 +27,8 @@ export const renderLoadElements = (
 		dynamicColourEssentialLoad4,
 		dynamicColourEssentialLoad5,
 		dynamicColourEssentialLoad6,
+		dynamicColourEssentialLoad7,
+		dynamicColourEssentialLoad8,
 		decimalPlaces,
 		loadColour,
 		flowColour,
@@ -50,8 +52,54 @@ export const renderLoadElements = (
 		load5_switch,
 		load6_name,
 		load6_switch,
+		load7_name,
+		load7_switch,
+		load8_name,
+		load8_switch,
 		dynamic_colour,
 	} = config.load;
+
+	const showSideLoads =
+		config.wide || !config.load.show_aux ? 'inline' : 'none';
+	const stackLoads78 = config.load.loads_7_8_layout === 'stack-right';
+	const fullLoad7Pos = stackLoads78
+		? {
+				rx: 413,
+				ry: 268,
+				tx: config.wide ? 416 : 445,
+				ty: 297,
+				px: 421,
+				py: 243,
+				vy: 279,
+			}
+		: {
+				rx: 376,
+				ry: 268,
+				tx: config.wide ? 379 : 408,
+				ty: 297,
+				px: 384,
+				py: 243,
+				vy: 279,
+			};
+	const fullLoad8Pos = stackLoads78
+		? {
+				rx: 413,
+				ry: 298,
+				tx: config.wide ? 416 : 445,
+				ty: 327,
+				px: 421,
+				py: 273,
+				vy: 309,
+			}
+		: {
+				rx: 413,
+				ry: 268,
+				tx: config.wide ? 416 : 445,
+				ty: 297,
+				px: 421,
+				py: 243,
+				vy: 279,
+			};
 
 	return html`
 		<!-- Load Elements -->
@@ -63,11 +111,9 @@ export const renderLoadElements = (
 		>
 			<svg
 				id="es-load5"
-				style="overflow: visible; display: ${[5, 6].includes(additionalLoad)
-					? config.wide || !config.load.show_aux
-						? 'inline'
-						: 'none'
-					: `none`};"
+				style="overflow: visible; display: ${
+					additionalLoad >= 5 ? showSideLoads : 'none'
+				};"
 				x="${config.wide ? '5%' : '-15.25%'}"
 			>
 				<rect
@@ -81,18 +127,18 @@ export const renderLoadElements = (
 					fill="none"
 					stroke="${dynamicColourEssentialLoad5}"
 					pointer-events="all"
-					display="${[5, 6].includes(additionalLoad) ? 'inline' : 'none'}"
+					display="${additionalLoad >= 5 ? 'inline' : 'none'}"
 				/>
 				${renderText(
 					'ess-load5',
 					config.wide ? 416 : 445,
 					59,
-					[5, 6].includes(additionalLoad),
+					additionalLoad >= 5,
 					config.wide ? 'st3 st8 left-align' : 'st3 st8 right-align',
 					dynamicColourEssentialLoad5,
 					load5_name,
 				)}
-				<g display="${[5, 6].includes(additionalLoad) ? 'inline' : 'none'}">
+				<g display="${additionalLoad >= 5 ? 'inline' : 'none'}">
 					${renderIcon(
 						load5_switch,
 						data.iconEssentialLoad5,
@@ -106,7 +152,7 @@ export const renderLoadElements = (
 					config.wide ? 416 : 445,
 					70,
 					!!config.entities?.essential_load5_extra &&
-						[5, 6].includes(additionalLoad) &&
+						additionalLoad >= 5 &&
 						!showAux &&
 						data.stateEssentialLoad5Extra.isValid(),
 					config.wide ? 'st3 left-align' : 'st3 right-align',
@@ -121,7 +167,7 @@ export const renderLoadElements = (
 					'ess_load5_value',
 					430,
 					41,
-					[5, 6].includes(additionalLoad) && data.stateEssentialLoad5.isValid(),
+					additionalLoad >= 5 && data.stateEssentialLoad5.isValid(),
 					'st3',
 					dynamicColourEssentialLoad5,
 					data.stateEssentialLoad5.toPowerString(auto_scale, decimalPlaces),
@@ -130,11 +176,9 @@ export const renderLoadElements = (
 			</svg>
 			<svg
 				id="es-load6"
-				style="overflow: visible; display: ${[6].includes(additionalLoad)
-					? config.wide || !config.load.show_aux
-						? 'inline'
-						: 'none'
-					: `none`};"
+				style="overflow: visible; display: ${
+					additionalLoad >= 6 ? showSideLoads : 'none'
+				};"
 				x="${config.wide ? '5%' : '-15.25%'}"
 			>
 				<rect
@@ -148,18 +192,18 @@ export const renderLoadElements = (
 					fill="none"
 					stroke="${dynamicColourEssentialLoad6}"
 					pointer-events="all"
-					display="${[5, 6].includes(additionalLoad) ? 'inline' : 'none'}"
+					display="${additionalLoad >= 6 ? 'inline' : 'none'}"
 				/>
 				${renderText(
 					'ess-load6',
 					config.wide ? 416 : 445,
 					178,
-					[5, 6].includes(additionalLoad),
+					additionalLoad >= 6,
 					config.wide ? 'st3 st8 left-align' : 'st3 st8 right-align',
 					dynamicColourEssentialLoad6,
 					load6_name,
 				)}
-				<g display="${[5, 6].includes(additionalLoad) ? 'inline' : 'none'}">
+				<g display="${additionalLoad >= 6 ? 'inline' : 'none'}">
 					${renderIcon(
 						load6_switch,
 						data.iconEssentialLoad6,
@@ -173,7 +217,7 @@ export const renderLoadElements = (
 					config.wide ? 416 : 445,
 					190,
 					!!config.entities?.essential_load6_extra &&
-						[5, 6].includes(additionalLoad) &&
+						additionalLoad >= 6 &&
 						!showAux &&
 						!!config.wide &&
 						data.stateEssentialLoad6Extra.isValid(),
@@ -189,11 +233,143 @@ export const renderLoadElements = (
 					'ess_load6_value',
 					430,
 					160,
-					[5, 6].includes(additionalLoad) && data.stateEssentialLoad6.isValid(),
+					additionalLoad >= 6 && data.stateEssentialLoad6.isValid(),
 					'st3',
 					dynamicColourEssentialLoad6,
 					data.stateEssentialLoad6.toPowerString(auto_scale, decimalPlaces),
 					(e) => Utils.handlePopup(e, config.entities.essential_load6),
+				)}
+			</svg>
+			<svg
+				id="es-load7"
+				style="overflow: visible; display: ${
+					additionalLoad >= 7 ? showSideLoads : 'none'
+				};"
+				x="${config.wide ? '5%' : '-15.25%'}"
+			>
+				<rect
+					id="es-load7"
+					x="${fullLoad7Pos.rx}"
+					y="${fullLoad7Pos.ry}"
+					width="35"
+					height="20"
+					rx="4.5"
+					ry="4.5"
+					fill="none"
+					stroke="${dynamicColourEssentialLoad7}"
+					pointer-events="all"
+					display="${additionalLoad >= 7 ? 'inline' : 'none'}"
+				/>
+				${renderText(
+					'ess-load7',
+					fullLoad7Pos.tx,
+					fullLoad7Pos.ty,
+					additionalLoad >= 7,
+					config.wide ? 'st3 st8 left-align' : 'st3 st8 right-align',
+					dynamicColourEssentialLoad7,
+					load7_name,
+				)}
+				<g display="${additionalLoad >= 7 ? 'inline' : 'none'}">
+					${renderIcon(
+						load7_switch,
+						data.iconEssentialLoad7,
+						'essload7-small-icon',
+						fullLoad7Pos.px,
+						fullLoad7Pos.py,
+					)}
+				</g>
+				${createTextWithPopup(
+					'ess_load7_value_extra',
+					fullLoad7Pos.tx,
+					fullLoad7Pos.ty + 12,
+					!!config.entities?.essential_load7_extra &&
+						additionalLoad >= 7 &&
+						!showAux &&
+						!!config.wide &&
+						data.stateEssentialLoad7Extra.isValid(),
+					config.wide ? 'st3 left-align' : 'st3 right-align',
+					dynamicColourEssentialLoad7,
+					`${Utils.formatNumberLocale(
+						data.stateEssentialLoad7Extra.toNum(1),
+						1,
+					)} ${data.stateEssentialLoad7Extra?.getUOM()}`,
+					(e) => Utils.handlePopup(e, config.entities.essential_load7_extra),
+				)}
+				${createTextWithPopup(
+					'ess_load7_value',
+					fullLoad7Pos.px + (stackLoads78 ? 9 : 9),
+					fullLoad7Pos.vy,
+					additionalLoad >= 7 && data.stateEssentialLoad7.isValid(),
+					'st3',
+					dynamicColourEssentialLoad7,
+					data.stateEssentialLoad7.toPowerString(auto_scale, decimalPlaces),
+					(e) => Utils.handlePopup(e, config.entities.essential_load7),
+				)}
+			</svg>
+			<svg
+				id="es-load8"
+				style="overflow: visible; display: ${
+					additionalLoad >= 8 ? showSideLoads : 'none'
+				};"
+				x="${config.wide ? '5%' : '-15.25%'}"
+			>
+				<rect
+					id="es-load8"
+					x="${fullLoad8Pos.rx}"
+					y="${fullLoad8Pos.ry}"
+					width="35"
+					height="20"
+					rx="4.5"
+					ry="4.5"
+					fill="none"
+					stroke="${dynamicColourEssentialLoad8}"
+					pointer-events="all"
+					display="${additionalLoad >= 8 ? 'inline' : 'none'}"
+				/>
+				${renderText(
+					'ess-load8',
+					fullLoad8Pos.tx,
+					fullLoad8Pos.ty,
+					additionalLoad >= 8,
+					config.wide ? 'st3 st8 left-align' : 'st3 st8 right-align',
+					dynamicColourEssentialLoad8,
+					load8_name,
+				)}
+				<g display="${additionalLoad >= 8 ? 'inline' : 'none'}">
+					${renderIcon(
+						load8_switch,
+						data.iconEssentialLoad8,
+						'essload8-small-icon',
+						fullLoad8Pos.px,
+						fullLoad8Pos.py,
+					)}
+				</g>
+				${createTextWithPopup(
+					'ess_load8_value_extra',
+					fullLoad8Pos.tx,
+					fullLoad8Pos.ty + 12,
+					!!config.entities?.essential_load8_extra &&
+						additionalLoad >= 8 &&
+						!showAux &&
+						!!config.wide &&
+						data.stateEssentialLoad8Extra.isValid(),
+					config.wide ? 'st3 left-align' : 'st3 right-align',
+					dynamicColourEssentialLoad8,
+					`${Utils.formatNumberLocale(
+						data.stateEssentialLoad8Extra.toNum(1),
+						1,
+					)} ${data.stateEssentialLoad8Extra?.getUOM()}`,
+					(e) => Utils.handlePopup(e, config.entities.essential_load8_extra),
+				)}
+				${createTextWithPopup(
+					'ess_load8_value',
+					fullLoad8Pos.px + 9,
+					fullLoad8Pos.vy,
+					additionalLoad >= 8 && data.stateEssentialLoad8.isValid(),
+					'st3',
+					dynamicColourEssentialLoad8,
+					data.stateEssentialLoad8.toPowerString(auto_scale, decimalPlaces),
+					(e) => Utils.handlePopup(e, config.entities.essential_load8),
 				)}
 			</svg>
 			<rect
@@ -231,7 +407,7 @@ export const renderLoadElements = (
 				fill="none"
 				stroke="${dynamicColourEssentialLoad1}"
 				pointer-events="all"
-				display="${[2, 4, 5, 6].includes(additionalLoad) ? 'inline' : 'none'}"
+				display="${[2, 4, 5, 6, 7, 8].includes(additionalLoad) ? 'inline' : 'none'}"
 			/>
 			<rect
 				id="es-load2"
@@ -244,7 +420,7 @@ export const renderLoadElements = (
 				fill="none"
 				stroke="${dynamicColourEssentialLoad2}"
 				pointer-events="all"
-				display="${[2, 4, 5, 6].includes(additionalLoad) ? 'inline' : 'none'}"
+				display="${[2, 4, 5, 6, 7, 8].includes(additionalLoad) ? 'inline' : 'none'}"
 			/>
 			<rect
 				id="es-load4"
@@ -257,9 +433,9 @@ export const renderLoadElements = (
 				fill="none"
 				stroke="${dynamicColourEssentialLoad3}"
 				pointer-events="all"
-				display="${!showAux && [3, 4, 5, 6].includes(additionalLoad)
-					? ''
-					: 'none'}"
+				display="${
+					!showAux && [3, 4, 5, 6, 7, 8].includes(additionalLoad) ? '' : 'none'
+				}"
 			/>
 			<rect
 				id="es-load4"
@@ -272,9 +448,9 @@ export const renderLoadElements = (
 				fill="none"
 				stroke="${dynamicColourEssentialLoad4}"
 				pointer-events="all"
-				display="${!showAux && [3, 4, 5, 6].includes(additionalLoad)
-					? ''
-					: 'none'}"
+				display="${
+					!showAux && [3, 4, 5, 6, 7, 8].includes(additionalLoad) ? '' : 'none'
+				}"
 			/>
 
 			${renderText(
@@ -289,10 +465,10 @@ export const renderLoadElements = (
 			)}
 			${renderText(
 				'ess_load',
-				!showAux && [4, 5, 6].includes(additionalLoad) ? 411 : 409,
+				!showAux && [4, 5, 6, 7, 8].includes(additionalLoad) ? 411 : 409,
 				130,
 				([1, 2].includes(additionalLoad) && showAux) ||
-					(!showAux && [4, 5, 6].includes(additionalLoad)),
+					(!showAux && [4, 5, 6, 7, 8].includes(additionalLoad)),
 				'st3 st8',
 				loadColour,
 				config.load.essential_name || localize('common.essential'),
@@ -310,7 +486,7 @@ export const renderLoadElements = (
 				'ess-load2',
 				!showAux ? 408 : 406,
 				!showAux ? 59 : 178,
-				[2, 4, 5, 6].includes(additionalLoad),
+				[2, 4, 5, 6, 7, 8].includes(additionalLoad),
 				'st3 st8 right-align',
 				dynamicColourEssentialLoad1,
 				load1_name,
@@ -319,7 +495,7 @@ export const renderLoadElements = (
 				'ess-load2',
 				!showAux ? 414 : 412,
 				!showAux ? 59 : 178,
-				[2, 4, 5, 6].includes(additionalLoad),
+				[2, 4, 5, 6, 7, 8].includes(additionalLoad),
 				'st3 st8 left-align',
 				dynamicColourEssentialLoad2,
 				load2_name,
@@ -328,7 +504,7 @@ export const renderLoadElements = (
 				'ess-load4',
 				408,
 				178,
-				[4, 5, 6].includes(additionalLoad),
+				[4, 5, 6, 7, 8].includes(additionalLoad),
 				'st3 st8 right-align',
 				dynamicColourEssentialLoad3,
 				load3_name,
@@ -337,7 +513,7 @@ export const renderLoadElements = (
 				'ess-load4',
 				414,
 				178,
-				[4, 5, 6].includes(additionalLoad),
+				[4, 5, 6, 7, 8].includes(additionalLoad),
 				'st3 st8 left-align',
 				dynamicColourEssentialLoad4,
 				load4_name,
@@ -381,7 +557,7 @@ export const renderLoadElements = (
 			${renderPath(
 				'es-load1',
 				'M 412 143 L 412 135',
-				!showAux && [4, 5, 6].includes(additionalLoad),
+				!showAux && [4, 5, 6, 7, 8].includes(additionalLoad),
 				data.load2Colour,
 				1,
 			)}
@@ -395,7 +571,7 @@ export const renderLoadElements = (
 			${renderPath(
 				'es-load2',
 				'M 412 80 L 412 53',
-				!showAux && [2, 4, 5, 6].includes(additionalLoad),
+				!showAux && [2, 4, 5, 6, 7, 8].includes(additionalLoad),
 				data.load1Colour,
 				1,
 			)}
@@ -505,31 +681,35 @@ export const renderLoadElements = (
 						<linearGradient id="Lg-essen_aux" x1="0%" x2="0%" y1="100%" y2="0%">
 							<stop
 								offset="0%"
-								stop-color="${data.gridPercentage > 0
-									? gridColour
-									: data.batteryPercentage > 0
-										? batteryColour
-										: solarColour}"
+								stop-color="${
+									data.gridPercentage > 0
+										? gridColour
+										: data.batteryPercentage > 0
+											? batteryColour
+											: solarColour
+								}"
 							/>
 							<stop
 								offset="${data.gridPercentage}%"
-								stop-color="${data.gridPercentage > 0
-									? gridColour
-									: data.batteryPercentage > 0
-										? batteryColour
-										: solarColour}"
+								stop-color="${
+									data.gridPercentage > 0
+										? gridColour
+										: data.batteryPercentage > 0
+											? batteryColour
+											: solarColour
+								}"
 							/>
 							<stop
 								offset="${data.gridPercentage}%"
-								stop-color="${data.batteryPercentage > 0
-									? batteryColour
-									: solarColour}"
+								stop-color="${
+									data.batteryPercentage > 0 ? batteryColour : solarColour
+								}"
 							/>
 							<stop
 								offset="${data.gridPercentage + data.batteryPercentage}%"
-								stop-color="${data.batteryPercentage > 0
-									? batteryColour
-									: solarColour}"
+								stop-color="${
+									data.batteryPercentage > 0 ? batteryColour : solarColour
+								}"
 							/>
 							<stop
 								offset="${data.gridPercentage + data.batteryPercentage}%"
@@ -539,9 +719,9 @@ export const renderLoadElements = (
 						</linearGradient>
 					</defs>
 					<path
-						display="${[1, 2].includes(additionalLoad) && !showAux
-							? ''
-							: 'none'}"
+						display="${
+							[1, 2].includes(additionalLoad) && !showAux ? '' : 'none'
+						}"
 						fill="${dynamic_colour ? `url(#Lg-essen_aux)` : loadColour}"
 						d="${data.essIcon}"
 					/>
@@ -565,31 +745,35 @@ export const renderLoadElements = (
 						>
 							<stop
 								offset="0%"
-								stop-color="${data.gridPercentage > 0
-									? gridColour
-									: data.batteryPercentage > 0
-										? batteryColour
-										: solarColour}"
+								stop-color="${
+									data.gridPercentage > 0
+										? gridColour
+										: data.batteryPercentage > 0
+											? batteryColour
+											: solarColour
+								}"
 							/>
 							<stop
 								offset="${data.gridPercentage}%"
-								stop-color="${data.gridPercentage > 0
-									? gridColour
-									: data.batteryPercentage > 0
-										? batteryColour
-										: solarColour}"
+								stop-color="${
+									data.gridPercentage > 0
+										? gridColour
+										: data.batteryPercentage > 0
+											? batteryColour
+											: solarColour
+								}"
 							/>
 							<stop
 								offset="${data.gridPercentage}%"
-								stop-color="${data.batteryPercentage > 0
-									? batteryColour
-									: solarColour}"
+								stop-color="${
+									data.batteryPercentage > 0 ? batteryColour : solarColour
+								}"
 							/>
 							<stop
 								offset="${data.gridPercentage + data.batteryPercentage}%"
-								stop-color="${data.batteryPercentage > 0
-									? batteryColour
-									: solarColour}"
+								stop-color="${
+									data.batteryPercentage > 0 ? batteryColour : solarColour
+								}"
 							/>
 							<stop
 								offset="${data.gridPercentage + data.batteryPercentage}%"
@@ -599,9 +783,9 @@ export const renderLoadElements = (
 						</linearGradient>
 					</defs>
 					<path
-						display="${[1, 2].includes(additionalLoad) && showAux
-							? ''
-							: 'none'}"
+						display="${
+							[1, 2].includes(additionalLoad) && showAux ? '' : 'none'
+						}"
 						fill="${dynamic_colour ? `url(#Lg-essen_noaux)` : loadColour}"
 						d="${data.essIcon}"
 					/>
@@ -625,31 +809,35 @@ export const renderLoadElements = (
 						>
 							<stop
 								offset="0%"
-								stop-color="${data.gridPercentage > 0
-									? gridColour
-									: data.batteryPercentage > 0
-										? batteryColour
-										: solarColour}"
+								stop-color="${
+									data.gridPercentage > 0
+										? gridColour
+										: data.batteryPercentage > 0
+											? batteryColour
+											: solarColour
+								}"
 							/>
 							<stop
 								offset="${data.gridPercentage}%"
-								stop-color="${data.gridPercentage > 0
-									? gridColour
-									: data.batteryPercentage > 0
-										? batteryColour
-										: solarColour}"
+								stop-color="${
+									data.gridPercentage > 0
+										? gridColour
+										: data.batteryPercentage > 0
+											? batteryColour
+											: solarColour
+								}"
 							/>
 							<stop
 								offset="${data.gridPercentage}%"
-								stop-color="${data.batteryPercentage > 0
-									? batteryColour
-									: solarColour}"
+								stop-color="${
+									data.batteryPercentage > 0 ? batteryColour : solarColour
+								}"
 							/>
 							<stop
 								offset="${data.gridPercentage + data.batteryPercentage}%"
-								stop-color="${data.batteryPercentage > 0
-									? batteryColour
-									: solarColour}"
+								stop-color="${
+									data.batteryPercentage > 0 ? batteryColour : solarColour
+								}"
 							/>
 							<stop
 								offset="${data.gridPercentage + data.batteryPercentage}%"
@@ -659,9 +847,9 @@ export const renderLoadElements = (
 						</linearGradient>
 					</defs>
 					<path
-						display="${[4, 5, 6].includes(additionalLoad) && !showAux
-							? ''
-							: 'none'}"
+						display="${
+							[4, 5, 6, 7, 8].includes(additionalLoad) && !showAux ? '' : 'none'
+						}"
 						fill="${dynamic_colour ? `url(#Lg-essen_noaux_four)` : loadColour}"
 						d="${data.essIcon}"
 					/>
@@ -685,31 +873,35 @@ export const renderLoadElements = (
 						>
 							<stop
 								offset="0%"
-								stop-color="${data.gridPercentage > 0
-									? gridColour
-									: data.batteryPercentage > 0
-										? batteryColour
-										: solarColour}"
+								stop-color="${
+									data.gridPercentage > 0
+										? gridColour
+										: data.batteryPercentage > 0
+											? batteryColour
+											: solarColour
+								}"
 							/>
 							<stop
 								offset="${data.gridPercentage}%"
-								stop-color="${data.gridPercentage > 0
-									? gridColour
-									: data.batteryPercentage > 0
-										? batteryColour
-										: solarColour}"
+								stop-color="${
+									data.gridPercentage > 0
+										? gridColour
+										: data.batteryPercentage > 0
+											? batteryColour
+											: solarColour
+								}"
 							/>
 							<stop
 								offset="${data.gridPercentage}%"
-								stop-color="${data.batteryPercentage > 0
-									? batteryColour
-									: solarColour}"
+								stop-color="${
+									data.batteryPercentage > 0 ? batteryColour : solarColour
+								}"
 							/>
 							<stop
 								offset="${data.gridPercentage + data.batteryPercentage}%"
-								stop-color="${data.batteryPercentage > 0
-									? batteryColour
-									: solarColour}"
+								stop-color="${
+									data.batteryPercentage > 0 ? batteryColour : solarColour
+								}"
 							/>
 							<stop
 								offset="${data.gridPercentage + data.batteryPercentage}%"
@@ -719,9 +911,9 @@ export const renderLoadElements = (
 						</linearGradient>
 					</defs>
 					<path
-						display="${[1, 2, 3, 4, 5, 6].includes(additionalLoad)
-							? 'none'
-							: ''}"
+						display="${
+							[1, 2, 3, 4, 5, 6, 7, 8].includes(additionalLoad) ? 'none' : ''
+						}"
 						fill="${dynamic_colour ? `url(#Lg-essen_default)` : loadColour}"
 						d="${data.essIcon}"
 					/>
@@ -739,6 +931,8 @@ export const renderLoadElements = (
 					data.iconEssentialLoad4,
 					data.iconEssentialLoad5,
 					data.iconEssentialLoad6,
+					data.iconEssentialLoad7,
+					data.iconEssentialLoad8,
 					// Include dynamic colours so icon fill updates when they change
 					data.dynamicColourEssentialLoad1,
 					data.dynamicColourEssentialLoad2,
@@ -746,6 +940,8 @@ export const renderLoadElements = (
 					data.dynamicColourEssentialLoad4,
 					data.dynamicColourEssentialLoad5,
 					data.dynamicColourEssentialLoad6,
+					data.dynamicColourEssentialLoad7,
+					data.dynamicColourEssentialLoad8,
 				],
 				() =>
 					repeat(
@@ -755,7 +951,9 @@ export const renderLoadElements = (
 					),
 			)}
 
-			<g display="${[2, 4, 5, 6].includes(additionalLoad) ? 'inline' : 'none'}">
+			<g
+				display="${[2, 4, 5, 6, 7, 8].includes(additionalLoad) ? 'inline' : 'none'}"
+			>
 				${renderIcon(
 					load1_switch,
 					data.iconEssentialLoad1,
@@ -764,7 +962,9 @@ export const renderLoadElements = (
 					showAux ? 123 : 5,
 				)}
 			</g>
-			<g display="${[2, 4, 5, 6].includes(additionalLoad) ? 'inline' : 'none'}">
+			<g
+				display="${[2, 4, 5, 6, 7, 8].includes(additionalLoad) ? 'inline' : 'none'}"
+			>
 				${renderIcon(
 					load2_switch,
 					data.iconEssentialLoad2,
@@ -773,7 +973,9 @@ export const renderLoadElements = (
 					showAux ? 123 : 5,
 				)}
 			</g>
-			<g display="${[4, 5, 6].includes(additionalLoad) ? 'inline' : 'none'}">
+			<g
+				display="${[4, 5, 6, 7, 8].includes(additionalLoad) ? 'inline' : 'none'}"
+			>
 				${renderIcon(
 					load3_switch,
 					data.iconEssentialLoad3,
@@ -782,7 +984,9 @@ export const renderLoadElements = (
 					123,
 				)}
 			</g>
-			<g display="${[4, 5, 6].includes(additionalLoad) ? 'inline' : 'none'}">
+			<g
+				display="${[4, 5, 6, 7, 8].includes(additionalLoad) ? 'inline' : 'none'}"
+			>
 				${renderIcon(
 					load4_switch,
 					data.iconEssentialLoad4,
@@ -860,7 +1064,7 @@ export const renderLoadElements = (
 				408,
 				70,
 				!!config.entities?.essential_load1_extra &&
-					[2, 4, 5, 6].includes(additionalLoad) &&
+					[2, 4, 5, 6, 7, 8].includes(additionalLoad) &&
 					!showAux &&
 					data.stateEssentialLoad1Extra.isValid(),
 				'st3 right-align',
@@ -876,7 +1080,7 @@ export const renderLoadElements = (
 				414,
 				70,
 				!!config.entities?.essential_load2_extra &&
-					[2, 4, 5, 6].includes(additionalLoad) &&
+					[2, 4, 5, 6, 7, 8].includes(additionalLoad) &&
 					!showAux &&
 					data.stateEssentialLoad2Extra.isValid(),
 				'st3 left-align',
@@ -887,9 +1091,10 @@ export const renderLoadElements = (
 				)} ${data.stateEssentialLoad2Extra?.getUOM()}`,
 				(e) => Utils.handlePopup(e, config.entities.essential_load2_extra),
 			)}
-			${config.entities?.essential_power &&
-			config.entities.essential_power !== 'none'
-				? svg`
+			${
+				config.entities?.essential_power &&
+				config.entities.essential_power !== 'none'
+					? svg`
                     ${createTextWithPopup(
 											'ess_power',
 											270,
@@ -904,7 +1109,7 @@ export const renderLoadElements = (
 												Utils.handlePopup(e, config.entities.essential_power),
 											false,
 										)}`
-				: svg`
+					: svg`
                     ${renderText(
 											'ess_power',
 											270,
@@ -916,7 +1121,8 @@ export const renderLoadElements = (
 												? `${Utils.convertValue(essentialPower, decimalPlaces) || 0}`
 												: `${essentialPower || 0} ${UnitOfPower.WATT}`,
 											false,
-										)}`}
+										)}`
+			}
 			${createTextWithPopup(
 				'ess_load1_value',
 				409,
@@ -931,7 +1137,7 @@ export const renderLoadElements = (
 				'ess_load2_value',
 				showAux ? 391 : 394,
 				showAux ? 160 : 41,
-				[2, 4, 5, 6].includes(additionalLoad) &&
+				[2, 4, 5, 6, 7, 8].includes(additionalLoad) &&
 					data.stateEssentialLoad2.isValid(),
 				'st3',
 				dynamicColourEssentialLoad1,
@@ -942,7 +1148,7 @@ export const renderLoadElements = (
 				'ess_load2_value',
 				showAux ? 427 : 430,
 				showAux ? 160 : 41,
-				[2, 4, 5, 6].includes(additionalLoad) &&
+				[2, 4, 5, 6, 7, 8].includes(additionalLoad) &&
 					data.stateEssentialLoad2.isValid(),
 				'st3',
 				dynamicColourEssentialLoad2,
@@ -953,7 +1159,7 @@ export const renderLoadElements = (
 				'ess_load3_value',
 				392,
 				160,
-				[4, 5, 6].includes(additionalLoad) &&
+				[4, 5, 6, 7, 8].includes(additionalLoad) &&
 					data.stateEssentialLoad3.isValid(),
 				'st3',
 				dynamicColourEssentialLoad3,
@@ -964,7 +1170,7 @@ export const renderLoadElements = (
 				'ess_load4_value',
 				430,
 				160,
-				[4, 5, 6].includes(additionalLoad) &&
+				[4, 5, 6, 7, 8].includes(additionalLoad) &&
 					data.stateEssentialLoad4.isValid(),
 				'st3',
 				dynamicColourEssentialLoad4,

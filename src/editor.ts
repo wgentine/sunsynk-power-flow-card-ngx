@@ -77,7 +77,7 @@ export class SunSynkCardEditor
 	private static readonly HELP_TEXT: Record<string, string> = {
 		large_font: 'Use a larger font for card entities.',
 		wide: 'Use a wide layout for the card.',
-		additional_loads: 'Number of additional loads to configure (0–6).',
+		additional_loads: 'Number of additional loads to configure (0–8).',
 		colour: 'Primary colour for this element.',
 		efficiency:
 			'Show the effeciency of the mppts strings based on their max power.',
@@ -988,7 +988,7 @@ export class SunSynkCardEditor
 									{ name: 'essential_name', selector: { text: {} } },
 									{
 										name: 'additional_loads',
-										selector: { number: { mode: 'box', min: 0, max: 6 } },
+										selector: { number: { mode: 'box', min: 0, max: 8 } },
 									},
 									...((this._config.load?.additional_loads ?? 0) >= 1
 										? [
@@ -1052,6 +1052,28 @@ export class SunSynkCardEditor
 												{ name: 'load6_switch', selector: { entity: {} } },
 												{
 													name: 'load6_max_threshold',
+													selector: { number: {} },
+												},
+											]
+										: []),
+									...((this._config.load?.additional_loads ?? 0) >= 7
+										? [
+												{ name: 'load7_name', selector: { text: {} } },
+												{ name: 'load7_icon', selector: { icon: {} } },
+												{ name: 'load7_switch', selector: { entity: {} } },
+												{
+													name: 'load7_max_threshold',
+													selector: { number: {} },
+												},
+											]
+										: []),
+									...((this._config.load?.additional_loads ?? 0) >= 8
+										? [
+												{ name: 'load8_name', selector: { text: {} } },
+												{ name: 'load8_icon', selector: { icon: {} } },
+												{ name: 'load8_switch', selector: { entity: {} } },
+												{
+													name: 'load8_max_threshold',
 													selector: { number: {} },
 												},
 											]
@@ -1176,6 +1198,18 @@ export class SunSynkCardEditor
 												? [
 														{ name: 'load6_name', selector: { entity: {} } },
 														{ name: 'load6_icon', selector: { entity: {} } },
+													]
+												: []),
+											...((this._config.load?.additional_loads ?? 0) >= 7
+												? [
+														{ name: 'load7_name', selector: { entity: {} } },
+														{ name: 'load7_icon', selector: { entity: {} } },
+													]
+												: []),
+											...((this._config.load?.additional_loads ?? 0) >= 8
+												? [
+														{ name: 'load8_name', selector: { entity: {} } },
+														{ name: 'load8_icon', selector: { entity: {} } },
 													]
 												: []),
 											...((this._config.load?.aux_loads ?? 0) >= 1
@@ -1765,6 +1799,18 @@ export class SunSynkCardEditor
 												},
 											},
 											{
+												name: 'essential_load7',
+												selector: {
+													entity: { device_class: SensorDeviceClass.POWER },
+												},
+											},
+											{
+												name: 'essential_load8',
+												selector: {
+													entity: { device_class: SensorDeviceClass.POWER },
+												},
+											},
+											{
 												name: 'essential_load1_extra',
 												selector: { entity: {} },
 											},
@@ -1786,6 +1832,14 @@ export class SunSynkCardEditor
 											},
 											{
 												name: 'essential_load6_extra',
+												selector: { entity: {} },
+											},
+											{
+												name: 'essential_load7_extra',
+												selector: { entity: {} },
+											},
+											{
+												name: 'essential_load8_extra',
 												selector: { entity: {} },
 											},
 											{
@@ -2003,7 +2057,7 @@ export class SunSynkCardEditor
 			case 'three_phase': {
 				const on = Boolean(
 					cfg?.inverter &&
-						(cfg.inverter as Record<string, unknown>).three_phase,
+					(cfg.inverter as Record<string, unknown>).three_phase,
 				);
 				const v = on ? '3P' : '1P';
 				return `${base} (${v})`;

@@ -229,6 +229,12 @@
       "bat1": "电池1",
       "bat2": "电池2"
     },
-    "disable_animations": "Disable Flow Animations"
+    "disable_animations": "Disable Flow Animations",
+    "load7_name": "负载7名称",
+    "load8_name": "负载8名称",
+    "load7_icon": "负载7图标",
+    "load8_icon": "负载8图标",
+    "load7_max_threshold": "负载7最大阈值",
+    "load8_max_threshold": "负载8最大阈值"
   }
 }
