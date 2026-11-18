@@ -100,12 +100,12 @@
     const INV = { x: 388, y: 238, r: 40 };
     const HOME = { x: 520, y: 238, r: 26 };
     const BUS_Y = 198;
-    const BUS_X0 = 558;
-    const BUS_X1 = 828;
-    const MERGE_X = INV.x;
-    const PV_CORRIDOR_Y = 134;
     const COL0 = 588;
     const COL_SP = 88;
+    const BUS_X0 = 558;
+    const BUS_X1 = COL0 + COL_SP * 3;
+    const MERGE_X = INV.x;
+    const PV_CORRIDOR_Y = 134;
 
     const LOADS = [
       { id: 1, cx: COL0, cy: 112, w: 350, icon: 'ev', name: 'EV charger' },
@@ -160,6 +160,12 @@
       return { x: cx, y: cy - R };
     }
 
+    function ringAt(cx, cy, r, angleDeg, glow = false) {
+      const R = outerR(r, glow);
+      const a = (angleDeg * Math.PI) / 180;
+      return { x: cx + Math.cos(a) * R, y: cy + Math.sin(a) * R };
+    }
+
     const MASK_NODES = [
       { ...PV1, glow: true, id: 'pv1' },
       { ...PV2, glow: true, id: 'pv2' },
@@ -182,10 +188,10 @@
       return `<g transform="translate(${x},${y}) scale(${s})"><path d="${d}" fill="${color}"/></g>`;
     }
 
-    function flow(d, color, id, dur = '2.4s', bus = false) {
+    function flow(d, color, id, dur = '2.4s', bus = false, noDot = false) {
       const dotR = dir === 'a' ? 4 : 2.5;
       const cap = bus ? 'flow-bus' : '';
-      const dot = dir === 'a' || id.startsWith('flow-')
+      const dot = !noDot && (dir === 'a' || id.startsWith('flow-'))
         ? `<circle class="dot-glow" r="${dotR}" fill="${color}"><animateMotion dur="${dur}" repeatCount="indefinite"><mpath href="#${id}"/></animateMotion></circle>`
         : '';
       return `<path class="flow-track ${cap}" d="${d}" stroke="${color}"/>
@@ -266,10 +272,12 @@
 
     const flows = [];
     const flowIds = [];
+    const flowEdges = [];
 
-    function addFlow(d, color, id, dur = '2.4s', bus = false) {
-      flows.push(flow(d, color, id, dur, bus));
+    function addFlow(d, color, id, dur = '2.4s', bus = false, noDot = false, edge = null) {
+      flows.push(flow(d, color, id, dur, bus, noDot));
       flowIds.push(id);
+      if (edge) flowEdges.push({ pathId: id, ...edge });
     }
 
     // PV: bottom of ring → corridor below pills → trunk → inverter top ring
@@ -279,54 +287,51 @@
     const pv2Out = ringOut(PV2.cx, PV2.cy, PV2.r, pv2LaneX, PV_CORRIDOR_Y);
     addFlow(
       `M ${pv1Out.x} ${pv1Out.y} L ${pv1LaneX} ${pv1Out.y} L ${pv1LaneX} ${PV_CORRIDOR_Y} L ${MERGE_X} ${PV_CORRIDOR_Y}`,
-      pal.solar, 'flow-pv1', '2.2s',
+      pal.solar, 'flow-pv1', '2.2s', false, false, { from: 'pv1', to: 'trunk' },
     );
     addFlow(
       `M ${pv2Out.x} ${pv2Out.y} L ${pv2LaneX} ${pv2Out.y} L ${pv2LaneX} ${PV_CORRIDOR_Y} L ${MERGE_X} ${PV_CORRIDOR_Y}`,
-      pal.solar, 'flow-pv2', '2.5s',
+      pal.solar, 'flow-pv2', '2.5s', false, false, { from: 'pv2', to: 'trunk' },
     );
     const invTop = ringTop(INV.x, INV.y, INV.r);
     addFlow(
       `M ${MERGE_X} ${PV_CORRIDOR_Y} L ${invTop.x} ${invTop.y}`,
-      pal.solar, 'flow-pv-trunk', '2s',
+      pal.solar, 'flow-pv-trunk', '2s', false, false, { from: 'trunk', to: 'inv' },
     );
 
-    // Grid → grid CT → inverter (inline, no diagonals)
-    const gOut = ringOut(GRID.cx, GRID.cy, GRID.r, GRIDCT.cx, GRID.cy);
-    const ctIn = ringIn(GRIDCT.cx, GRIDCT.cy, GRIDCT.r, GRID.cx, GRID.cy);
-    addFlow(`M ${gOut.x} ${gOut.y} L ${ctIn.x} ${ctIn.y}`, pal.grid, 'flow-grid-ct', '3.1s');
-    const ctOut = ringOut(GRIDCT.cx, GRIDCT.cy, GRIDCT.r, INV.x, INV.y);
-    const invGridIn = ringIn(INV.x, INV.y, INV.r, GRIDCT.cx, GRIDCT.cy);
-    const midG = (ctOut.x + invGridIn.x) / 2;
+    const gOut = ringAt(GRID.cx, GRID.cy, GRID.r, 0);
+    const ctIn = ringAt(GRIDCT.cx, GRIDCT.cy, GRIDCT.r, 180);
+    addFlow(`M ${gOut.x} ${gOut.y} L ${ctIn.x} ${ctIn.y}`, pal.grid, 'flow-grid-ct', '3.1s', false, true, { from: 'grid', to: 'gridct' });
+    const ctOut = ringAt(GRIDCT.cx, GRIDCT.cy, GRIDCT.r, 0);
+    const invGridIn = ringAt(INV.x, INV.y, INV.r, 180);
     addFlow(
-      `M ${ctOut.x} ${ctOut.y} C ${midG} ${ctOut.y} ${midG} ${invGridIn.y} ${invGridIn.x} ${invGridIn.y}`,
-      pal.grid, 'flow-grid-inv', '3s',
+      `M ${ctOut.x} ${ctOut.y} L ${invGridIn.x} ${invGridIn.y}`,
+      pal.grid, 'flow-grid-inv', '3s', false, false, { from: 'gridct', to: 'inv' },
     );
 
-    // Non-essential: short drop under grid node
-    const gDown = ringOut(GRID.cx, GRID.cy, GRID.r, NONESS.cx, NONESS.cy);
-    const neIn = ringIn(NONESS.cx, NONESS.cy, NONESS.r, GRID.cx, GRID.cy);
-    addFlow(`M ${gDown.x} ${gDown.y} L ${neIn.x} ${neIn.y}`, pal.grid, 'flow-noness', '2.9s');
+    const gDown = ringAt(GRID.cx, GRID.cy, GRID.r, 90);
+    const neIn = ringAt(NONESS.cx, NONESS.cy, NONESS.r, -90);
+    addFlow(`M ${gDown.x} ${gDown.y} L ${neIn.x} ${neIn.y}`, pal.grid, 'flow-noness', '2.9s', false, false, { from: 'grid', to: 'noness' });
 
-    const invBatOut = ringOut(INV.x, INV.y, INV.r, INV.x, BATT.cy);
-    const batTopIn = ringIn(BATT.cx, BATT.cy, BATT.r, INV.x, INV.y);
-    addFlow(`M ${invBatOut.x} ${invBatOut.y} L ${batTopIn.x} ${batTopIn.y}`, pal.battery, 'flow-bat', '2.6s');
+    const invBatOut = ringAt(INV.x, INV.y, INV.r, 90);
+    const batTopIn = ringAt(BATT.cx, BATT.cy, BATT.r, -90);
+    addFlow(`M ${invBatOut.x} ${invBatOut.y} L ${batTopIn.x} ${batTopIn.y}`, pal.battery, 'flow-bat', '2.6s', false, false, { from: 'inv', to: 'battery' });
 
-    const invHomeOut = ringOut(INV.x, INV.y, INV.r, HOME.cx, HOME.cy);
-    const homeInvIn = ringIn(HOME.x, HOME.y, HOME.r, INV.x, INV.y);
-    addFlow(`M ${invHomeOut.x} ${invHomeOut.y} L ${homeInvIn.x} ${homeInvIn.y}`, pal.load, 'flow-inv-home', '2s');
+    const invEast = ringAt(INV.x, INV.y, INV.r, 0);
+    const homeWest = ringAt(HOME.x, HOME.y, HOME.r, 180);
+    addFlow(`M ${invEast.x} ${invEast.y} L ${homeWest.x} ${homeWest.y}`, pal.load, 'flow-inv-home', '2s', false, false, { from: 'inv', to: 'home' });
 
-    const homeBusOut = ringOut(HOME.x, HOME.y, HOME.r, BUS_X0, BUS_Y);
+    const homeEast = ringAt(HOME.x, HOME.y, HOME.r, 0);
     addFlow(
-      `M ${homeBusOut.x} ${homeBusOut.y} C ${homeBusOut.x + 44} ${homeBusOut.y} ${BUS_X0 - 48} ${(HOME.y + BUS_Y) / 2} ${BUS_X0} ${BUS_Y}`,
-      pal.load, 'flow-home-bus', '2.1s',
+      `M ${homeEast.x} ${homeEast.y} C ${homeEast.x + 56} ${homeEast.y} ${BUS_X0 - 36} ${BUS_Y} ${BUS_X0} ${BUS_Y}`,
+      pal.load, 'flow-home-bus', '2.1s', false, false, { from: 'home', to: 'bus' },
     );
 
-    addFlow(`M ${BUS_X0} ${BUS_Y} L ${BUS_X1} ${BUS_Y}`, pal.load, 'flow-bus', '2.8s', true);
+    addFlow(`M ${BUS_X0} ${BUS_Y} L ${BUS_X1} ${BUS_Y}`, pal.load, 'flow-bus', '2.8s', true, false, { from: 'bus', to: 'bus-end' });
 
     LOADS.forEach((l) => {
-      const tip = ringIn(l.cx, l.cy, LR, l.cx, BUS_Y);
-      addFlow(`M ${l.cx} ${BUS_Y} L ${tip.x} ${tip.y}`, pal.load, `flow-L${l.id}`, `${1.4 + l.w / 900}s`);
+      const tip = l.cy < BUS_Y ? ringAt(l.cx, l.cy, LR, 90) : ringAt(l.cx, l.cy, LR, -90);
+      addFlow(`M ${l.cx} ${BUS_Y} L ${tip.x} ${tip.y}`, pal.load, `flow-L${l.id}`, `${1.4 + l.w / 900}s`, false, false, { from: 'bus', to: `load-${l.id}` });
     });
     const circ = 2 * Math.PI * socR;
     const dash = circ * SOC;
@@ -346,7 +351,7 @@
       nodes += luminousNode(GRIDCT.cx, GRIDCT.cy, GRIDCT.r, pal.grid, 'grid', 'gridct');
       labels += pill(GRID.cx - 4, GRID.cy - GRID.r - 34, '100', 'W', 'Grid import', pal.grid, 'end');
       nodes += luminousNode(INV.x, INV.y, INV.r, pal.inv, 'inv', 'inv');
-      labels += pill(INV.x + INV.r + 12, INV.y + 30, '4.50', 'kW', 'Inverter', pal.inv, 'start');
+      labels += pill(INV.x - 10, INV.y + INV.r + 8, '4.50', 'kW', 'Inverter', pal.inv, 'end');
       nodes += luminousNode(HOME.x, HOME.y, HOME.r, pal.load, 'home', 'home');
       nodes += `<g id="battery" transform="translate(${BATT.cx},${BATT.cy})">
         <circle r="${socR + 8}" fill="${nodeFill}" stroke="none"/>
@@ -414,10 +419,21 @@
       rGlow: outerR(n.r, n.glow),
     }));
 
+    const qaNodes = [
+      ...nodeCircles,
+      { id: 'trunk', cx: MERGE_X, cy: PV_CORRIDOR_Y, r: 0, rGlow: 0 },
+      { id: 'bus', cx: BUS_X0, cy: BUS_Y, r: 0, rGlow: 0 },
+      { id: 'bus-end', cx: BUS_X1, cy: BUS_Y, r: 0, rGlow: 0 },
+    ];
+
     window.__mockupQa = {
+      dir,
       textBoxes,
-      nodeCircles,
+      nodeCircles: qaNodes,
       flowIds,
+      flowEdges,
+      busLine: { x0: BUS_X0, x1: BUS_X1, y: BUS_Y },
+      ringTol: 2,
       pad: 2,
     };
   </script>

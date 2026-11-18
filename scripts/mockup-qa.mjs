@@ -94,15 +94,99 @@ export async function auditMockupGeometry(page) {
       }
     }
 
-    for (let i = 0; i < nodes.length; i++) {
-      for (let j = i + 1; j < nodes.length; j++) {
-        const A = nodes[i];
-        const B = nodes[j];
+    const physicalNodes = nodes.filter((n) => n.r > 0);
+    for (let i = 0; i < physicalNodes.length; i++) {
+      for (let j = i + 1; j < physicalNodes.length; j++) {
+        const A = physicalNodes[i];
+        const B = physicalNodes[j];
         const d = Math.hypot(A.cx - B.cx, A.cy - B.cy);
         const ra = A.rGlow ?? A.r;
         const rb = B.rGlow ?? B.r;
         if (d < ra + rb + pad) {
           violations.push({ kind: 'node-node', a: A.id, b: B.id, dist: d, min: ra + rb });
+        }
+      }
+    }
+
+    const ringTol = window.__mockupQa?.ringTol ?? 2;
+    const flowEdges = window.__mockupQa?.flowEdges ?? [];
+    const qaDir = window.__mockupQa?.dir ?? 'a';
+
+  function distToRing(px, py, node) {
+      if (!node) return Infinity;
+      if (node.r === 0) return Math.hypot(px - node.cx, py - node.cy);
+      const d = Math.hypot(px - node.cx, py - node.cy);
+      return Math.abs(d - node.r);
+    }
+
+    const nodeById = (id) => nodes.find((n) => n.id === id);
+    const busLine = window.__mockupQa?.busLine;
+
+    function onBusLine(px, py) {
+      if (!busLine) return false;
+      return (
+        Math.abs(py - busLine.y) <= ringTol
+        && px >= busLine.x0 - ringTol
+        && px <= busLine.x1 + ringTol
+      );
+    }
+
+    function snapsToNetwork(px, py) {
+      if (onBusLine(px, py)) return true;
+      return nodes.some((n) => distToRing(px, py, n) <= ringTol);
+    }
+
+    if (qaDir === 'a') {
+      for (const edge of flowEdges) {
+        const el = document.getElementById(edge.pathId);
+        if (!el) {
+          violations.push({ kind: 'edge-missing', pathId: edge.pathId });
+          continue;
+        }
+        let len = 0;
+        try {
+          len = el.getTotalLength();
+        } catch {
+          continue;
+        }
+        const start = el.getPointAtLength(0);
+        const end = el.getPointAtLength(len);
+        const fromN = nodeById(edge.from);
+        const toN = nodeById(edge.to);
+        const startOk = edge.from === 'bus' ? onBusLine(start.x, start.y) : distToRing(start.x, start.y, fromN) <= ringTol;
+        if (!startOk) {
+          violations.push({
+            kind: 'edge-start',
+            path: edge.pathId,
+            from: edge.from,
+            dist: edge.from === 'bus' ? Math.abs(start.y - (busLine?.y ?? 0)) : distToRing(start.x, start.y, fromN),
+          });
+        }
+        if (distToRing(end.x, end.y, toN) > ringTol) {
+          violations.push({
+            kind: 'edge-end',
+            path: edge.pathId,
+            to: edge.to,
+            dist: distToRing(end.x, end.y, toN),
+          });
+        }
+      }
+
+      for (const el of paths) {
+        let len = 0;
+        try {
+          len = el.getTotalLength();
+        } catch {
+          continue;
+        }
+        if (len <= 0) continue;
+        const start = el.getPointAtLength(0);
+        const end = el.getPointAtLength(len);
+        if (!snapsToNetwork(start.x, start.y)) {
+          violations.push({ kind: 'float-start', path: el.id, at: { x: start.x, y: start.y } });
+        }
+        if (!snapsToNetwork(end.x, end.y)) {
+          violations.push({ kind: 'float-end', path: el.id, at: { x: end.x, y: end.y } });
         }
       }
     }
