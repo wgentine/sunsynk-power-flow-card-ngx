@@ -80,6 +80,22 @@ export const styles: CSSResultGroup = css`
 	.remaining-energy {
 		font-size: 9px;
 	}
+
+	.style-preview-a .card {
+		box-shadow: var(
+			--ha-card-box-shadow,
+			0 1px 2px rgba(0, 0, 0, 0.08),
+			0 8px 24px rgba(95, 182, 173, 0.12)
+		);
+	}
+
+	.style-preview-b .card {
+		box-shadow: var(
+			--ha-card-box-shadow,
+			0 0 0 1px rgba(34, 211, 238, 0.25),
+			0 10px 30px rgba(0, 0, 0, 0.35)
+		);
+	}
 `;
 
 export const getDynamicStyles = (data) => html`
@@ -187,6 +203,30 @@ export const getDynamicStyles = (data) => html`
 		.grid-icon-small {
 			color: ${data.customGridIconColour} !important;
 			--mdc-icon-size: 32px;
+		}
+
+		${
+			data.config?.style_preview
+				? `
+		:host {
+			--sp-bubble-fill: ${
+				data.config.style_preview === 'a'
+					? 'rgba(95, 182, 173, 0.16)'
+					: 'rgba(12, 18, 32, 0.55)'
+			};
+			--sp-bubble-stroke: ${
+				data.config.style_preview === 'a'
+					? 'rgba(95, 182, 173, 0.5)'
+					: 'rgba(34, 211, 238, 0.85)'
+			};
+		}
+		.sp-name-a, .sp-name-b { font-size: 8px; font-weight: 600; }
+		.sp-power-a, .sp-power-b { font-size: 9px; font-weight: 700; }
+		.sp-grid-icon {
+			color: ${data.customGridIconColour} !important;
+			--mdc-icon-size: 52px;
+		}`
+				: ''
 		}
 	</style>
 `;

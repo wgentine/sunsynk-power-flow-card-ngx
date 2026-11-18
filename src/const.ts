@@ -16,6 +16,7 @@ export const validnonLoadValues = [0, 1, 2, 3];
 export const valid3phase = [true, false];
 export const validaux = [true, false];
 export const validauxLoads = [0, 1, 2];
+export const validStylePreview = ['a', 'b'] as const;
 export const validGridDisconnected = [
 	'off',
 	'0',

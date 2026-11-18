@@ -36,10 +36,14 @@ export const fullCard = (
 	return html`
 		<ha-card>
 			${getDynamicStyles(data)}
-			<div class="container card">
+			<div
+				class="container card ${config.style_preview
+					? `style-preview-${config.style_preview}`
+					: ''}"
+			>
 				${titleTemplate}
 				<svg
-					viewBox="${config.wide ? '0 0 720 405' : `0 0 ${483 + extraEssentialLoadViewWidth(data.additionalLoad)} 405`}"
+					viewBox="${config.wide ? '0 0 720 405' : `0 0 ${483 + extraEssentialLoadViewWidth(data.additionalLoad, config.style_preview)} 405`}"
 					preserveAspectRatio="xMidYMid meet"
 					height="${data.cardHeight}"
 					width="${data.cardWidth}"

@@ -379,6 +379,9 @@ export class SunsynkPowerFlowCard extends LitElement {
 	}
 
 	render() {
+		if (!this._config) {
+			return null;
+		}
 		// Clear per-render caches
 		this._lineWidthCache.clear();
 		// Clear per-render cache and rebuild tracked entities for this render
@@ -2448,7 +2451,10 @@ export class SunsynkPowerFlowCard extends LitElement {
 				viewBoxHeightLite = '408';
 		}
 
-		const loadViewExtra = extraEssentialLoadViewWidth(additionalLoad);
+		const loadViewExtra = extraEssentialLoadViewWidth(
+			additionalLoad,
+			config.style_preview,
+		);
 		if (loadViewExtra > 0) {
 			viewBoxWidthLite = String(Number(viewBoxWidthLite) + loadViewExtra);
 		}

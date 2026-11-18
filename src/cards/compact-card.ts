@@ -35,7 +35,11 @@ export const compactCard = (
 	return html`
 		<ha-card>
 			${getDynamicStyles(data)}
-			<div class="container card">
+			<div
+				class="container card ${config.style_preview
+					? `style-preview-${config.style_preview}`
+					: ''}"
+			>
 				${titleTemplate}
 				<svg
 					viewBox="${config.wide

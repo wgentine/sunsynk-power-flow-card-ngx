@@ -12,8 +12,23 @@ import {
 import { createTextWithPopup, renderText } from '../../../helpers/text-utils';
 import { renderPath } from '../../../helpers/render-path';
 import { renderCircle } from '../../../helpers/render-circle';
+import { isStylePreview } from '../../shared/style-preview/preview-tokens';
+import { renderIcon } from '../../../helpers/render-icon';
 
 const renderGridIcons = (data: DataDto, config: sunsynkPowerFlowCardConfig) => {
+	if (isStylePreview(config.style_preview)) {
+		return svg`
+			${renderIcon(
+				undefined,
+				'mdi:transmission-tower',
+				'sp-grid-icon',
+				4,
+				188,
+				56,
+				56,
+			)}
+		`;
+	}
 	const isGridConnected = validGridConnected.includes(
 		data.gridStatus.toLowerCase(),
 	);

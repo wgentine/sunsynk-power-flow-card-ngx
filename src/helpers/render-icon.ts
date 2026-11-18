@@ -22,12 +22,17 @@ export function renderIcon(
 	width: number = 30,
 	height: number = 30,
 	show: boolean = true,
+	/** When true, icon is anchored to foreignObject (for dense preview bubbles). */
+	localPosition: boolean = false,
 ) {
+	const posStyle = localPosition
+		? `position:absolute;inset:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;`
+		: `position:fixed;width:${width}px;height:${height}px;`;
 	if (icon && entity) {
 		return svg`
             <a href="#" @click=${(e) => Utils.handlePopup(e, entity)}>
                 <foreignObject x="${x}" y="${y}" width="${width}" height="${height}" display="${show ? 'inline' : 'none'}">
-                    <div xmlns="http://www.w3.org/1999/xhtml" style="position: fixed; width: ${width}px; height: ${height}px;">
+                    <div xmlns="http://www.w3.org/1999/xhtml" style="${posStyle}">
                         <ha-icon icon="${icon}" class="${className}"></ha-icon>
                     </div>
                 </foreignObject>
@@ -35,7 +40,7 @@ export function renderIcon(
 	} else if (icon) {
 		return svg`
             <foreignObject x="${x}" y="${y}" width="${width}" height="${height}" display="${show ? 'inline' : 'none'}">
-                <div xmlns="http://www.w3.org/1999/xhtml" style="position: fixed; width: ${width}px; height: ${height}px;">
+                <div xmlns="http://www.w3.org/1999/xhtml" style="${posStyle}">
                     <ha-icon icon="${icon}" class="${className}"></ha-icon>
                 </div>
             </foreignObject>`;

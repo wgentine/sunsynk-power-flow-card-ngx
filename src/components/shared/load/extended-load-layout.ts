@@ -21,7 +21,15 @@ export const EXTENDED_LOAD_SLOTS: ReadonlyArray<{
 	{ load: 8, col: 3, row: 1 },
 ];
 
-export const extraEssentialLoadViewWidth = (additionalLoad: number): number => {
+import { isStylePreview, previewExtraViewWidth } from '../style-preview/preview-tokens';
+
+export const extraEssentialLoadViewWidth = (
+	additionalLoad: number,
+	stylePreview?: string,
+): number => {
+	if (isStylePreview(stylePreview)) {
+		return previewExtraViewWidth(additionalLoad);
+	}
 	if (additionalLoad >= 8) return 88;
 	if (additionalLoad >= 7) return 56;
 	if (additionalLoad >= 5) return 24;

@@ -16,6 +16,9 @@ import {
 	COMPACT_LOAD_COL_X,
 	COMPACT_LOAD_ROW_Y,
 } from '../../shared/load/extended-load-layout';
+import { isStylePreview } from '../../shared/style-preview/preview-tokens';
+import { renderEssentialLoadPreview } from '../../shared/style-preview/essential-load-preview';
+import type { StylePreviewId } from '../../shared/style-preview/preview-tokens';
 
 export const renderLoadElements = (
 	data: DataDto,
@@ -60,6 +63,10 @@ export const renderLoadElements = (
 		load8_switch,
 		dynamic_colour,
 	} = config.load;
+
+	const stylePreview = isStylePreview(config.style_preview)
+		? (config.style_preview as StylePreviewId)
+		: undefined;
 
 	const showCompactExtendedLoads =
 		config.wide || (!config.wide && [1, 2, 3].includes(config.solar.mppts));
@@ -196,7 +203,10 @@ export const renderLoadElements = (
 				stroke="${dynamic_colour ? flowColour : loadColour}"
 				pointer-events="all"
 			/>
-			<svg id="Esential-Load1" style="overflow: visible">
+			<svg
+				id="Esential-Load1"
+				style="overflow: visible; ${stylePreview ? 'display:none' : ''}"
+			>
 				<rect
 					id="es-load1"
 					x="406"
@@ -224,7 +234,7 @@ export const renderLoadElements = (
 					440,
 					133,
 					[1, 2, 3].includes(additionalLoad) &&
-						data.stateEssentialLoad1.isValid(),
+						data.stateEssentialLoad1?.isValid(),
 					`${largeFont !== true ? 'st14' : 'st4'} st8`,
 					dynamicColourEssentialLoad1,
 					data.stateEssentialLoad1?.toPowerString(auto_scale, decimalPlaces),
@@ -257,7 +267,10 @@ export const renderLoadElements = (
 					)}
 				</g>
 			</svg>
-			<svg id="Esential-Load2" style="overflow: visible">
+			<svg
+				id="Esential-Load2"
+				style="overflow: visible; ${stylePreview ? 'display:none' : ''}"
+			>
 				<rect
 					id="es-load2"
 					x="406"
@@ -315,7 +328,10 @@ export const renderLoadElements = (
 					)}
 				</g>
 			</svg>
-			<svg id="Esential-Load3" style="overflow: visible">
+			<svg
+				id="Esential-Load3"
+				style="overflow: visible; ${stylePreview ? 'display:none' : ''}"
+			>
 				<rect
 					id="es-load2"
 					x="405"
@@ -429,7 +445,10 @@ export const renderLoadElements = (
 					(e) => Utils.handlePopup(e, config.entities.essential_load3),
 				)}
 			</svg>
-			<svg id="Esential-Load4" style="overflow: visible">
+			<svg
+				id="Esential-Load4"
+				style="overflow: visible; ${stylePreview ? 'display:none' : ''}"
+			>
 				<rect
 					id="es-load3"
 					x="405"
@@ -618,7 +637,7 @@ export const renderLoadElements = (
 					'ess_load4',
 					423,
 					118,
-					additionalLoad >= 4 && data.stateEssentialLoad1.isValid(),
+					additionalLoad >= 4 && data.stateEssentialLoad1?.isValid(),
 					'st3',
 					dynamicColourEssentialLoad1,
 					data.stateEssentialLoad1?.toPowerString(auto_scale, decimalPlaces),
@@ -815,29 +834,36 @@ export const renderLoadElements = (
 					config.load.invert_flow === true,
 				)}
 			</svg>
-			${renderPath(
-				'es-load1',
-				'M 441 180 L 441 147',
-				additionalLoad === 1,
-				data.load1Colour,
-				1,
-			)}
-			${renderPath(
-				'es-load1',
-				'M 441 180 L 441 147',
-				[2, 3, 4, 5, 6, 7, 8].includes(additionalLoad),
-				data.load1Colour,
-				1,
-			)}
-			${renderPath(
-				'es-load2',
-				'M 441 290 L 441 257',
-				[2, 3, 4, 5, 6, 7, 8].includes(additionalLoad),
-				data.load2Colour,
-				1,
-			)}
+			${!stylePreview
+				? renderPath(
+						'es-load1',
+						'M 441 180 L 441 147',
+						additionalLoad === 1,
+						data.load1Colour,
+						1,
+					)
+				: ''}
+			${!stylePreview
+				? renderPath(
+						'es-load1',
+						'M 441 180 L 441 147',
+						[2, 3, 4, 5, 6, 7, 8].includes(additionalLoad),
+						data.load1Colour,
+						1,
+					)
+				: ''}
+			${!stylePreview
+				? renderPath(
+						'es-load2',
+						'M 441 290 L 441 257',
+						[2, 3, 4, 5, 6, 7, 8].includes(additionalLoad),
+						data.load2Colour,
+						1,
+					)
+				: ''}
 			<a
 				href="#"
+				style="${stylePreview ? 'display:none' : ''}"
 				@click=${
 					config.load?.navigate
 						? (e) => Utils.handleNavigation(e, config.load.navigate)
@@ -946,23 +972,24 @@ export const renderLoadElements = (
 												: `${essentialPower || 0} ${UnitOfPower.WATT}`,
 										)}`
 			}
-			${guard(
-				[
-					data.additionalLoad,
-					data.showAux,
-					data.iconEssentialLoad1,
-					data.iconEssentialLoad2,
-					// Include dynamic colours so icon fill updates when they change
-					data.dynamicColourEssentialLoad1,
-					data.dynamicColourEssentialLoad2,
-				],
-				() =>
-					repeat(
-						getCompactLayoutIconConfigs(data),
-						(iconConfig) => iconConfig.id,
-						(iconConfig) => renderStaticLoadIcon(data, iconConfig),
-					),
-			)}
+			${stylePreview && data
+				? renderEssentialLoadPreview(data, config, stylePreview, true)
+				: guard(
+						[
+							data.additionalLoad,
+							data.showAux,
+							data.iconEssentialLoad1,
+							data.iconEssentialLoad2,
+							data.dynamicColourEssentialLoad1,
+							data.dynamicColourEssentialLoad2,
+						],
+						() =>
+							repeat(
+								getCompactLayoutIconConfigs(data),
+								(iconConfig) => iconConfig.id,
+								(iconConfig) => renderStaticLoadIcon(data, iconConfig),
+							),
+					)}
 		</svg>
 	`;
 };

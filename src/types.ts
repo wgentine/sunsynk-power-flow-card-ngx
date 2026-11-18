@@ -69,6 +69,8 @@ export interface sunsynkPowerFlowCardConfig extends LovelaceCardConfig {
 	disable_animations?: boolean;
 	max_line_width: number;
 	min_line_width: number;
+	/** Temporary: visual direction for Stage 1 design review (`a` | `b`). */
+	style_preview?: 'a' | 'b';
 	inverter: {
 		modern: boolean;
 		colour: string;

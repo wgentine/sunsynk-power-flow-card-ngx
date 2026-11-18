@@ -16,6 +16,9 @@ import {
 	FULL_LOAD_COL_X,
 	FULL_LOAD_ROW_Y,
 } from '../../shared/load/extended-load-layout';
+import { isStylePreview } from '../../shared/style-preview/preview-tokens';
+import { renderEssentialLoadPreview } from '../../shared/style-preview/essential-load-preview';
+import type { StylePreviewId } from '../../shared/style-preview/preview-tokens';
 
 export const renderLoadElements = (
 	data: DataDto,
@@ -64,6 +67,13 @@ export const renderLoadElements = (
 	} = config.load;
 
 	const showExtendedLoads = config.wide || !config.load.show_aux;
+	const stylePreview = isStylePreview(config.style_preview)
+		? (config.style_preview as StylePreviewId)
+		: undefined;
+	const legacyEssDisplay = (show: boolean) =>
+		stylePreview ? 'none' : show ? 'inline' : 'none';
+	const legacyEssDisplayEmpty = (show: boolean) =>
+		stylePreview ? 'none' : show ? '' : 'none';
 	const fullLoadCell = (loadIndex: 5 | 6 | 7 | 8, col: number, row: number) => {
 		const rx = FULL_LOAD_COL_X[col];
 		const ry = FULL_LOAD_ROW_Y[row];
@@ -210,7 +220,7 @@ export const renderLoadElements = (
 				fill="none"
 				stroke="${dynamicColourEssentialLoad1}"
 				pointer-events="all"
-				display="${additionalLoad === 1 ? 'inline' : 'none'}"
+				display="${legacyEssDisplay(additionalLoad === 1)}"
 			/>
 			<rect
 				id="es-load2"
@@ -223,7 +233,7 @@ export const renderLoadElements = (
 				fill="none"
 				stroke="${dynamicColourEssentialLoad1}"
 				pointer-events="all"
-				display="${[2, 4, 5, 6, 7, 8].includes(additionalLoad) ? 'inline' : 'none'}"
+				display="${legacyEssDisplay([2, 4, 5, 6, 7, 8].includes(additionalLoad))}"
 			/>
 			<rect
 				id="es-load2"
@@ -236,7 +246,7 @@ export const renderLoadElements = (
 				fill="none"
 				stroke="${dynamicColourEssentialLoad2}"
 				pointer-events="all"
-				display="${[2, 4, 5, 6, 7, 8].includes(additionalLoad) ? 'inline' : 'none'}"
+				display="${legacyEssDisplay([2, 4, 5, 6, 7, 8].includes(additionalLoad))}"
 			/>
 			<rect
 				id="es-load4"
@@ -249,9 +259,9 @@ export const renderLoadElements = (
 				fill="none"
 				stroke="${dynamicColourEssentialLoad3}"
 				pointer-events="all"
-				display="${
-					!showAux && [3, 4, 5, 6, 7, 8].includes(additionalLoad) ? '' : 'none'
-				}"
+				display="${legacyEssDisplayEmpty(
+					!showAux && [3, 4, 5, 6, 7, 8].includes(additionalLoad),
+				)}"
 			/>
 			<rect
 				id="es-load4"
@@ -264,18 +274,21 @@ export const renderLoadElements = (
 				fill="none"
 				stroke="${dynamicColourEssentialLoad4}"
 				pointer-events="all"
-				display="${
-					!showAux && [3, 4, 5, 6, 7, 8].includes(additionalLoad) ? '' : 'none'
-				}"
+				display="${legacyEssDisplayEmpty(
+					!showAux && [3, 4, 5, 6, 7, 8].includes(additionalLoad),
+				)}"
 			/>
 			${
-				additionalLoad >= 5 && showExtendedLoads
+				additionalLoad >= 5 && showExtendedLoads && !stylePreview
 					? svg`<g id="essential-load-extended">
 							${fullLoadCell(5, 2, 0)} ${fullLoadCell(6, 2, 1)}
 							${fullLoadCell(7, 3, 0)} ${fullLoadCell(8, 3, 1)}
 						</g>`
 					: ''
 			}
+			${stylePreview
+				? renderEssentialLoadPreview(data, config, stylePreview, false)
+				: ''}
 			${renderText(
 				'essential_name',
 				411,
