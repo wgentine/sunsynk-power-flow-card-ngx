@@ -18,7 +18,7 @@ open "design/mockup/index.html?dir=b&theme=light"
 node scripts/mockup-capture.mjs
 ```
 
-Exits non-zero if geometry QA finds flow/text or flow/flow crossings (debug overlays written as `mockup-*-qa-overlay.png`).
+Exits non-zero if **direction A** fails geometry QA: path↔text, path↔path, **node circle↔text**, **node↔node**, plus **connectivity** (every `flowEdges` path end snaps to its declared node/bus within 2px; no floating path ends). Debug overlays: `mockup-a-*-qa-overlay.png`.
 
 Outputs (2× DPR):
 
