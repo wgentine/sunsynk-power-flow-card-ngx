@@ -97,33 +97,36 @@
           gridLine: dir === 'b' ? 'rgba(15,17,21,0.06)' : 'transparent',
         };
 
-    const INV = { x: 388, y: 246, r: 40 };
-    const HOME = { x: 478, y: 246, r: 26 };
-    const BUS_Y = 172;
-    const BUS_X0 = 548;
-    const BUS_X1 = 818;
-    const MERGE_X = 352;
-    const TRUNK_TOP = INV.y - INV.r - 2;
+    const INV = { x: 388, y: 238, r: 40 };
+    const HOME = { x: 468, y: 238, r: 26 };
+    const BUS_Y = 198;
+    const BUS_X0 = 558;
+    const BUS_X1 = 828;
+    const MERGE_X = 348;
+    const PV_CORRIDOR_Y = 172;
+    const COL0 = 588;
+    const COL_SP = 88;
 
     const LOADS = [
-      { id: 1, cx: 628, cy: 96, w: 350, icon: 'ev', name: 'EV charger' },
-      { id: 2, cx: 708, cy: 96, w: 400, icon: 'hw', name: 'Hot water' },
-      { id: 5, cx: 788, cy: 96, w: 550, icon: 'pool', name: 'Pool' },
-      { id: 7, cx: 848, cy: 96, w: 650, icon: 'garage', name: 'Garage' },
-      { id: 3, cx: 628, cy: 252, w: 450, icon: 'kitchen', name: 'Kitchen' },
-      { id: 4, cx: 708, cy: 252, w: 500, icon: 'office', name: 'Office' },
-      { id: 6, cx: 788, cy: 252, w: 600, icon: 'shed', name: 'Shed' },
-      { id: 8, cx: 848, cy: 252, w: 700, icon: 'shop', name: 'Workshop' },
+      { id: 1, cx: COL0, cy: 112, w: 350, icon: 'ev', name: 'EV charger' },
+      { id: 2, cx: COL0 + COL_SP, cy: 112, w: 400, icon: 'hw', name: 'Hot water' },
+      { id: 5, cx: COL0 + COL_SP * 2, cy: 112, w: 550, icon: 'pool', name: 'Pool' },
+      { id: 7, cx: COL0 + COL_SP * 3, cy: 112, w: 650, icon: 'garage', name: 'Garage' },
+      { id: 3, cx: COL0, cy: 284, w: 450, icon: 'kitchen', name: 'Kitchen' },
+      { id: 4, cx: COL0 + COL_SP, cy: 284, w: 500, icon: 'office', name: 'Office' },
+      { id: 6, cx: COL0 + COL_SP * 2, cy: 284, w: 600, icon: 'shed', name: 'Shed' },
+      { id: 8, cx: COL0 + COL_SP * 3, cy: 284, w: 700, icon: 'shop', name: 'Workshop' },
     ];
-    const LR = 30;
+    const LR = 28;
     const SOC = 0.75;
-    const GRID = { cx: 112, cy: 246, r: 36 };
-    const NONESS = { cx: 752, cy: 418, r: 30 };
-    const GRIDCT = { cx: 842, cy: 418, r: 30 };
+    const GRID = { cx: 92, cy: 228, r: 34 };
+    const GRIDCT = { cx: 168, cy: 228, r: 22 };
+    const NONESS = { cx: 92, cy: 318, r: 28 };
     const socR = 36;
     const BATT = { cx: INV.x, cy: 388, r: socR + 2 };
-    const PV1 = { cx: 284, cy: 70, r: 34 };
-    const PV2 = { cx: 404, cy: 70, r: 34 };
+    const PV1 = { cx: 268, cy: 58, r: 34 };
+    const PV2 = { cx: 388, cy: 58, r: 34 };
+    const textBoxes = [];
 
     const nodeFill = dir === 'a'
       ? (theme === 'dark' ? '#181b22' : '#ffffff')
@@ -184,7 +187,12 @@
         <path class="flow-active ${cap}" id="${id}" d="${d}" stroke="${color}"/>${dot}`;
     }
 
+    function trackText(x, y, w, h, id) {
+      textBoxes.push({ x, y, w, h, id });
+    }
+
     function statChip(x, y, w, h, lines) {
+      trackText(x, y, w, h, 'stat-chip');
       const fill = dir === 'a' ? pal.surfaceHi : pal.surface || (theme === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)');
       const stroke = dir === 'a' ? 'none' : pal.grid;
       const sw = dir === 'a' ? 0 : 0.6;
@@ -197,6 +205,7 @@
     function pill(x, y, value, unit, label, accent, anchor = 'middle') {
       const w = Math.max(58, value.length * 7 + 28);
       const ox = anchor === 'middle' ? x - w / 2 : anchor === 'start' ? x : x - w;
+      trackText(ox, y, w, 26, label || value);
       const fill = dir === 'a' ? pal.surfaceHi : 'transparent';
       const stroke = dir === 'b' ? accent : 'none';
       return `<g transform="translate(${ox},${y})">
@@ -216,100 +225,106 @@
       </g>`;
     }
 
-    function floatTile(cx, cy, color, icon, value, label, id) {
+    function floatTile(cx, cy, color, icon, value, label, id, textDy = 0) {
       const is = 20;
       return `<g id="${id}">
-        <line x1="${cx - 28}" y1="${cy + 22}" x2="${cx + 28}" y2="${cy + 22}" stroke="${pal.gridLine === 'transparent' ? color : pal.gridLine}" stroke-width="0.5"/>
+        <line x1="${cx - 28}" y1="${cy + 22 + textDy}" x2="${cx + 28}" y2="${cy + 22 + textDy}" stroke="${pal.gridLine === 'transparent' ? color : pal.gridLine}" stroke-width="0.5"/>
         ${iconSvg(icon, cx - is / 2, cy - is / 2 - 4, is, color, true)}
-        <text x="${cx}" y="${cy + 18}" text-anchor="middle" fill="${pal.text}" font-size="11" font-weight="600" font-variant-numeric="tabular-nums">${value}</text>
-        <text x="${cx}" y="${cy + 32}" text-anchor="middle" fill="${pal.muted}" font-size="9">${label}</text>
+        <text x="${cx}" y="${cy + 18 + textDy}" text-anchor="middle" fill="${pal.text}" font-size="11" font-weight="600" font-variant-numeric="tabular-nums">${value}</text>
+        <text x="${cx}" y="${cy + 32 + textDy}" text-anchor="middle" fill="${pal.muted}" font-size="9">${label}</text>
       </g>`;
     }
 
     function loadNode(l) {
+      const topRow = l.cy < BUS_Y;
       if (dir === 'b') {
-        return floatTile(l.cx, l.cy, pal.load, l.icon, `${l.w} W`, l.name, `load-${l.id}`);
+        const textDy = topRow ? -40 : 0;
+        trackText(l.cx - 36, l.cy + textDy + 26, 72, 12, l.name);
+        trackText(l.cx - 28, l.cy + textDy + 8, 56, 14, `${l.w} W`);
+        return floatTile(l.cx, l.cy, pal.load, l.icon, `${l.w} W`, l.name, `load-${l.id}`, textDy);
       }
       const is = 18;
+      const nameY = topRow ? l.cy - LR - 8 : l.cy + LR + 28;
+      const wattY = topRow ? l.cy - LR - 22 : l.cy + LR + 14;
+      const nameW = l.name.length * 5.2 + 8;
+      const wattW = String(l.w).length * 7 + 24;
+      trackText(l.cx - nameW / 2, nameY - 11, nameW, 12, l.name);
+      trackText(l.cx - wattW / 2, wattY - 12, wattW, 14, `${l.w} W`);
       return `<g id="load-${l.id}">
         <circle cx="${l.cx}" cy="${l.cy}" r="${LR + 2}" fill="${nodeFill}" stroke="none"/>
         <circle cx="${l.cx}" cy="${l.cy}" r="${LR}" fill="${nodeFill}" stroke="${pal.load}" stroke-width="2" stroke-opacity="0.55"/>
         ${iconSvg(l.icon, l.cx - is / 2, l.cy - is / 2, is, pal.load, false)}
-        <text x="${l.cx}" y="${l.cy + LR + 14}" text-anchor="middle" fill="${pal.text}" font-size="11" font-weight="600" font-variant-numeric="tabular-nums">${l.w} W</text>
-        <text x="${l.cx}" y="${l.cy + LR + 28}" text-anchor="middle" fill="${pal.muted}" font-size="9">${l.name}</text>
+        <text x="${l.cx}" y="${wattY}" text-anchor="middle" fill="${pal.text}" font-size="11" font-weight="600" font-variant-numeric="tabular-nums">${l.w} W</text>
+        <text x="${l.cx}" y="${nameY}" text-anchor="middle" fill="${pal.muted}" font-size="9">${l.name}</text>
       </g>`;
     }
 
     const flows = [];
-    const labelFloor = 154;
+    const flowIds = [];
 
-    // PV: ring bottom → below labels → merge trunk → inverter top ring
-    const pv1Out = ringOut(PV1.cx, PV1.cy, PV1.r, PV1.cx, labelFloor + 40);
-    const pv2Out = ringOut(PV2.cx, PV2.cy, PV2.r, PV2.cx, labelFloor + 40);
-    flows.push(flow(
-      `M ${pv1Out.x} ${pv1Out.y} L ${pv1Out.x} ${labelFloor} L ${MERGE_X} ${labelFloor}`,
+    function addFlow(d, color, id, dur = '2.4s', bus = false) {
+      flows.push(flow(d, color, id, dur, bus));
+      flowIds.push(id);
+    }
+
+    // PV: bottom of ring → corridor below pills → trunk → inverter top ring
+    const pv1Out = ringOut(PV1.cx, PV1.cy, PV1.r, PV1.cx, PV_CORRIDOR_Y);
+    const pv2Out = ringOut(PV2.cx, PV2.cy, PV2.r, PV2.cx, PV_CORRIDOR_Y);
+    addFlow(
+      `M ${pv1Out.x} ${pv1Out.y} L ${pv1Out.x} ${PV_CORRIDOR_Y} L ${MERGE_X} ${PV_CORRIDOR_Y}`,
       pal.solar, 'flow-pv1', '2.2s',
-    ));
-    flows.push(flow(
-      `M ${pv2Out.x} ${pv2Out.y} L ${pv2Out.x} ${labelFloor} L ${MERGE_X} ${labelFloor}`,
+    );
+    addFlow(
+      `M ${pv2Out.x} ${pv2Out.y} L ${pv2Out.x} ${PV_CORRIDOR_Y} L ${MERGE_X} ${PV_CORRIDOR_Y}`,
       pal.solar, 'flow-pv2', '2.5s',
-    ));
-    const invTopIn = ringIn(INV.x, INV.y, INV.r, MERGE_X, labelFloor - 60);
-    flows.push(flow(
-      `M ${MERGE_X} ${labelFloor} L ${MERGE_X} ${invTopIn.y - 8} L ${invTopIn.x} ${invTopIn.y}`,
+    );
+    const invTopIn = ringIn(INV.x, INV.y, INV.r, MERGE_X, PV_CORRIDOR_Y + 120);
+    addFlow(
+      `M ${MERGE_X} ${PV_CORRIDOR_Y} L ${MERGE_X} ${invTopIn.y} L ${invTopIn.x} ${invTopIn.y}`,
       pal.solar, 'flow-pv-trunk', '2s',
-    ));
+    );
 
-    const gridOut = ringOut(GRID.cx, GRID.cy, GRID.r, INV.x, INV.y);
-    const invGridIn = ringIn(INV.x, INV.y, INV.r, GRID.cx, GRID.cy);
-    const midGx = (gridOut.x + invGridIn.x) / 2;
-    flows.push(flow(
-      `M ${gridOut.x} ${gridOut.y} C ${midGx} ${gridOut.y} ${midGx} ${invGridIn.y} ${invGridIn.x} ${invGridIn.y}`,
-      pal.grid, 'flow-grid', '3s',
-    ));
+    // Grid → grid CT → inverter (inline, no diagonals)
+    const gOut = ringOut(GRID.cx, GRID.cy, GRID.r, GRIDCT.cx, GRID.cy);
+    const ctIn = ringIn(GRIDCT.cx, GRIDCT.cy, GRIDCT.r, GRID.cx, GRID.cy);
+    addFlow(`M ${gOut.x} ${gOut.y} L ${ctIn.x} ${ctIn.y}`, pal.grid, 'flow-grid-ct', '3.1s');
+    const ctOut = ringOut(GRIDCT.cx, GRIDCT.cy, GRIDCT.r, INV.x, INV.y);
+    const invGridIn = ringIn(INV.x, INV.y, INV.r, GRIDCT.cx, GRIDCT.cy);
+    const midG = (ctOut.x + invGridIn.x) / 2;
+    addFlow(
+      `M ${ctOut.x} ${ctOut.y} C ${midG} ${ctOut.y} ${midG} ${invGridIn.y} ${invGridIn.x} ${invGridIn.y}`,
+      pal.grid, 'flow-grid-inv', '3s',
+    );
 
-    const invBatOut = ringOut(INV.x, INV.y, INV.r, BATT.cx, BATT.cy);
-    const batTopIn = ringIn(BATT.cx, BATT.cy, BATT.r, INV.x, INV.y);
-    flows.push(flow(
-      `M ${invBatOut.x} ${invBatOut.y} L ${batTopIn.x} ${batTopIn.y}`,
+    // Non-essential: short drop under grid node
+    const gDown = ringOut(GRID.cx, GRID.cy, GRID.r, NONESS.cx, NONESS.cy);
+    const neIn = ringIn(NONESS.cx, NONESS.cy, NONESS.r, GRID.cx, GRID.cy);
+    addFlow(`M ${gDown.x} ${gDown.y} L ${neIn.x} ${neIn.y}`, pal.grid, 'flow-noness', '2.9s');
+
+    const batLaneX = INV.x - 52;
+    const invBatOut = ringOut(INV.x, INV.y, INV.r, batLaneX, BATT.cy);
+    const batTopIn = ringIn(BATT.cx, BATT.cy, BATT.r, batLaneX, INV.y);
+    addFlow(
+      `M ${invBatOut.x} ${invBatOut.y} L ${batLaneX} ${invBatOut.y} L ${batLaneX} ${batTopIn.y} L ${batTopIn.x} ${batTopIn.y}`,
       pal.battery, 'flow-bat', '2.6s',
-    ));
+    );
 
     const invHomeOut = ringOut(INV.x, INV.y, INV.r, HOME.cx, HOME.cy);
     const homeInvIn = ringIn(HOME.x, HOME.y, HOME.r, INV.x, INV.y);
-    flows.push(flow(
-      `M ${invHomeOut.x} ${invHomeOut.y} L ${homeInvIn.x} ${homeInvIn.y}`,
-      pal.load, 'flow-inv-home', '2s',
-    ));
+    addFlow(`M ${invHomeOut.x} ${invHomeOut.y} L ${homeInvIn.x} ${homeInvIn.y}`, pal.load, 'flow-inv-home', '2s');
 
     const homeBusOut = ringOut(HOME.x, HOME.y, HOME.r, BUS_X0, BUS_Y);
-    flows.push(flow(
-      `M ${homeBusOut.x} ${homeBusOut.y} C ${homeBusOut.x + 48} ${homeBusOut.y} ${BUS_X0 - 52} ${(HOME.y + BUS_Y) / 2} ${BUS_X0} ${BUS_Y}`,
+    addFlow(
+      `M ${homeBusOut.x} ${homeBusOut.y} C ${homeBusOut.x + 44} ${homeBusOut.y} ${BUS_X0 - 48} ${(HOME.y + BUS_Y) / 2} ${BUS_X0} ${BUS_Y}`,
       pal.load, 'flow-home-bus', '2.1s',
-    ));
+    );
 
-    flows.push(flow(`M ${BUS_X0} ${BUS_Y} L ${BUS_X1} ${BUS_Y}`, pal.load, 'flow-bus', '2.8s', true));
+    addFlow(`M ${BUS_X0} ${BUS_Y} L ${BUS_X1} ${BUS_Y}`, pal.load, 'flow-bus', '2.8s', true);
 
     LOADS.forEach((l) => {
       const tip = ringIn(l.cx, l.cy, LR, l.cx, BUS_Y);
-      flows.push(flow(`M ${l.cx} ${BUS_Y} L ${tip.x} ${tip.y}`, pal.load, `flow-L${l.id}`, `${1.4 + l.w / 900}s`));
+      addFlow(`M ${l.cx} ${BUS_Y} L ${tip.x} ${tip.y}`, pal.load, `flow-L${l.id}`, `${1.4 + l.w / 900}s`);
     });
-
-    const invNeOut = ringOut(INV.x, INV.y, INV.r, NONESS.cx, NONESS.cy);
-    const neIn = ringIn(NONESS.cx, NONESS.cy, NONESS.r, INV.x, INV.y);
-    const midNx = (invNeOut.x + neIn.x) / 2;
-    flows.push(flow(
-      `M ${invNeOut.x} ${invNeOut.y} C ${midNx} ${invNeOut.y + 40} ${midNx + 60} ${neIn.y} ${neIn.x} ${neIn.y}`,
-      pal.grid, 'flow-noness', '2.9s',
-    ));
-
-    const ctOut = ringOut(GRIDCT.cx, GRIDCT.cy, GRIDCT.r, GRID.cx, GRID.cy);
-    const gridCtIn = ringIn(GRID.cx, GRID.cy, GRID.r, GRIDCT.cx, GRIDCT.cy);
-    const midCx = (ctOut.x + gridCtIn.x) / 2;
-    flows.push(flow(
-      `M ${ctOut.x} ${ctOut.y} C ${midCx} ${ctOut.y - 30} ${midCx - 200} ${gridCtIn.y} ${gridCtIn.x} ${gridCtIn.y}`,
-      pal.grid, 'flow-gridct', '3.2s',
-    ));
     const circ = 2 * Math.PI * socR;
     const dash = circ * SOC;
 
@@ -321,13 +336,14 @@
     if (dir === 'a') {
       nodes += luminousNode(PV1.cx, PV1.cy, PV1.r, pal.solar, 'solar', 'pv1');
       nodes += luminousNode(PV2.cx, PV2.cy, PV2.r, pal.solar, 'solar', 'pv2');
-      labels += pill(PV1.cx, 118, '2.00', 'kW', 'PV 1', pal.solar);
-      labels += pill(PV2.cx, 118, '1.50', 'kW', 'PV 2', pal.solar);
-      labels += pill(MERGE_X + 56, 132, '3.50', 'kW', 'Solar total', pal.solar, 'start');
+      labels += pill(PV1.cx + 52, PV1.cy - 12, '2.00', 'kW', 'PV 1', pal.solar, 'start');
+      labels += pill(PV2.cx + 52, PV2.cy - 12, '1.50', 'kW', 'PV 2', pal.solar, 'start');
+      labels += pill(MERGE_X + 54, 98, '3.50', 'kW', 'Solar total', pal.solar, 'start');
       nodes += luminousNode(GRID.cx, GRID.cy, GRID.r, pal.grid, 'grid', 'grid');
-      labels += pill(112, 292, '100', 'W', 'Grid import', pal.grid);
+      nodes += luminousNode(GRIDCT.cx, GRIDCT.cy, GRIDCT.r, pal.grid, 'grid', 'gridct');
+      labels += pill(GRID.cx, GRID.cy + GRID.r + 30, '100', 'W', 'Grid import', pal.grid);
       nodes += luminousNode(INV.x, INV.y, INV.r, pal.inv, 'inv', 'inv');
-      labels += pill(INV.x + INV.r + 54, INV.y + 52, '4.50', 'kW', 'Inverter', pal.inv, 'start');
+      labels += pill(INV.x, INV.y + INV.r + 38, '4.50', 'kW', 'Inverter', pal.inv);
       nodes += luminousNode(HOME.x, HOME.y, HOME.r, pal.load, 'home', 'home');
       nodes += `<g id="battery" transform="translate(${BATT.cx},${BATT.cy})">
         <circle r="${socR + 8}" fill="${nodeFill}" stroke="none"/>
@@ -337,10 +353,10 @@
         <text text-anchor="middle" y="14" fill="${pal.muted}" font-size="9">Battery</text>
         <text text-anchor="middle" y="50" fill="${pal.battery}" font-size="11" font-weight="600">−500 W</text>
       </g>`;
+      trackText(BATT.cx - 28, BATT.cy + 38, 56, 14, 'battery-w');
       nodes += luminousNode(NONESS.cx, NONESS.cy, NONESS.r, pal.grid, 'homeOut', 'noness');
-      labels += pill(752, 458, '−100', 'W', 'Non-essential', pal.grid);
-      nodes += luminousNode(GRIDCT.cx, GRIDCT.cy, GRIDCT.r, pal.grid, 'grid', 'gridct');
-      labels += pill(842, 458, '0', 'W', 'Grid CT', pal.grid);
+      labels += pill(NONESS.cx, NONESS.cy + NONESS.r + 30, '−100', 'W', 'Non-essential', pal.grid);
+      labels += pill(GRIDCT.cx, GRIDCT.cy + GRIDCT.r + 30, '0', 'W', 'Grid CT', pal.grid);
     } else {
       const gridBg = Array.from({ length: 24 }, (_, i) =>
         `<line x1="${i * 40}" y1="0" x2="${i * 40}" y2="520" stroke="${pal.gridLine}"/>`
@@ -350,13 +366,13 @@
       nodes += `<g opacity="0.9">${gridBg}</g>`;
       nodes += floatTile(PV1.cx, PV1.cy, pal.solar, 'solar', '2.00 kW', 'PV 1', 'pv1');
       nodes += floatTile(PV2.cx, PV2.cy, pal.solar, 'solar', '1.50 kW', 'PV 2', 'pv2');
-      labels += pill(MERGE_X + 50, 128, '3.50', 'kW', 'Solar Σ', pal.solar, 'start');
-      nodes += floatTile(112, 246, pal.grid, 'grid', '100 W', 'Grid', 'grid');
+      labels += pill(MERGE_X + 54, 98, '3.50', 'kW', 'Solar Σ', pal.solar, 'start');
+      nodes += floatTile(GRID.cx, GRID.cy, pal.grid, 'grid', '100 W', 'Grid', 'grid');
+      nodes += floatTile(GRIDCT.cx, GRIDCT.cy, pal.grid, 'grid', '0 W', 'Grid CT', 'gridct');
       nodes += floatTile(INV.x, INV.y, pal.inv, 'inv', '4.50 kW', 'Inverter', 'inv');
       nodes += floatTile(HOME.x, HOME.y, pal.load, 'home', 'Essential', 'Home', 'home');
-      nodes += floatTile(INV.x, 388, pal.battery, 'battery', `${Math.round(SOC * 100)}%`, 'Battery −500 W', 'bat');
-      nodes += floatTile(752, 418, pal.grid, 'homeOut', '−100 W', 'Non-essential', 'noness');
-      nodes += floatTile(842, 418, pal.grid, 'grid', '0 W', 'Grid CT', 'gridct');
+      nodes += floatTile(INV.x, BATT.cy, pal.battery, 'battery', `${Math.round(SOC * 100)}%`, 'Battery −500 W', 'bat');
+      nodes += floatTile(NONESS.cx, NONESS.cy, pal.grid, 'homeOut', '−100 W', 'Non-essential', 'noness');
     }
 
     const loads = LOADS.map(loadNode).join('');
@@ -387,6 +403,12 @@
       <g id="layer-nodes">${nodes}</g>
       <g id="layer-loads">${loads}</g>`;
     document.getElementById('diagram').style.color = pal.text;
+
+    window.__mockupQa = {
+      textBoxes,
+      flowIds,
+      pad: 2,
+    };
   </script>
 </body>
 </html>

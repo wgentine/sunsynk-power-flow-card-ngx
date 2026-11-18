@@ -8,6 +8,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execSync } from 'node:child_process';
+import { auditMockupGeometry } from './mockup-qa.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
@@ -51,10 +52,40 @@ const context = await browser.newContext({
   deviceScaleFactor: 2,
 });
 const page = await context.newPage();
+let qaFailed = false;
 
 for (const [dir, theme] of combos) {
   await page.goto(`${base}?dir=${dir}&theme=${theme}`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(400);
+  const qa = await auditMockupGeometry(page);
+  if (!qa.ok) {
+    qaFailed = true;
+    const tag = `mockup-${dir}-${theme}`;
+    console.error(`QA FAIL ${tag}:`, JSON.stringify(qa.violations.slice(0, 12), null, 2));
+    const overlay = path.join(artifacts, `${tag}-qa-violations.json`);
+    fs.writeFileSync(overlay, JSON.stringify(qa, null, 2));
+    console.error('wrote', overlay);
+    await page.evaluate((violations) => {
+      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      g.setAttribute('id', 'qa-debug');
+      g.setAttribute('opacity', '0.85');
+      for (const v of violations) {
+        if (v.kind !== 'path-text' || !v.at) continue;
+        const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        c.setAttribute('cx', v.at.x);
+        c.setAttribute('cy', v.at.y);
+        c.setAttribute('r', '5');
+        c.setAttribute('fill', '#ff3366');
+        g.appendChild(c);
+      }
+      document.getElementById('diagram').appendChild(g);
+    }, qa.violations);
+    await page.locator('.card').screenshot({
+      path: path.join(artifacts, `${tag}-qa-overlay.png`),
+    });
+  } else {
+    console.log(`QA pass mockup-${dir}-${theme} (${qa.pathCount} paths, ${qa.textCount} text boxes)`);
+  }
   const out = path.join(artifacts, `mockup-${dir}-${theme}.png`);
   await page.locator('.card').screenshot({ path: out });
   console.log('saved', out);
@@ -97,7 +128,7 @@ const crops = [
   ['junction-inv-battery', { x: 330, y: 200, width: 140, height: 220 }],
   ['junction-home-bus', { x: 450, y: 130, width: 200, height: 150 }],
   ['junction-load-stub', { x: 600, y: 60, width: 100, height: 130 }],
-  ['junction-gridct', { x: 70, y: 350, width: 820, height: 120 }],
+  ['junction-gridct', { x: 40, y: 180, width: 220, height: 200 }],
 ];
 await page.goto(`${base}?dir=a&theme=dark`, { waitUntil: 'networkidle' });
 await page.waitForTimeout(400);
@@ -119,3 +150,8 @@ for (const [name, rel] of crops) {
 await context.close();
 await browser.close();
 server.close();
+
+if (qaFailed) {
+  console.error('mockup-capture: geometry QA failed — fix overlaps before shipping PNGs');
+  process.exitCode = 1;
+}
