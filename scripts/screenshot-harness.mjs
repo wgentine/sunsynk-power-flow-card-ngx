@@ -1,6 +1,5 @@
-/* eslint-env node */
 /**
- * Renders 8 essential loads per card style and layout option; saves PNGs to artifacts.
+ * Renders 8 essential loads per card style (4×2 grid, viewBox extended right).
  */
 import { chromium } from 'playwright';
 import http from 'node:http';
@@ -82,7 +81,7 @@ const defaultConfig = {
   },
 };
 
-function baseConfig(cardstyle, loads78Layout) {
+function baseConfig(cardstyle) {
   return {
     ...defaultConfig,
     type: 'custom:sunsynk-power-flow-card',
@@ -91,7 +90,6 @@ function baseConfig(cardstyle, loads78Layout) {
     load: {
       additional_loads: 8,
       show_aux: false,
-      loads_7_8_layout: loads78Layout,
       load1_name: 'L1 EV',
       load2_name: 'L2 HW',
       load3_name: 'L3 Kitchen',
@@ -137,15 +135,7 @@ function baseConfig(cardstyle, loads78Layout) {
   };
 }
 
-const LAYOUT_META = {
-  'pair-row':
-    'Loads 7–8 on a third row (7 left / 8 right); compact/lite uses a left column beside loads 5–6.',
-  'stack-right':
-    'Loads 7–8 stacked in the main right column between or below 5–6 (compact/lite infill rows).',
-};
-
 const styles = ['lite', 'compact', 'full'];
-const layouts = ['pair-row', 'stack-right'];
 
 const pageTemplate = (configJson, statesJson) => `<!DOCTYPE html>
 <html>
@@ -153,7 +143,7 @@ const pageTemplate = (configJson, statesJson) => `<!DOCTYPE html>
   <meta charset="utf-8" />
   <style>
     body { margin: 0; background: #111; }
-    #wrap { width: 540px; height: 500px; padding: 8px; }
+    #wrap { width: 620px; height: 500px; padding: 8px; }
     sunsynk-power-flow-card { display: block; width: 100%; height: 100%; --ha-card-background: #1e1e1e; }
   </style>
 </head>
@@ -190,9 +180,8 @@ const server = http.createServer((req, res) => {
     return;
   }
   const style = url.searchParams.get('style') || 'lite';
-  const layout = url.searchParams.get('layout') || 'pair-row';
   const html = pageTemplate(
-    JSON.stringify(baseConfig(style, layout)),
+    JSON.stringify(baseConfig(style)),
     JSON.stringify(mockStates()),
   );
   res.setHeader('Content-Type', 'text/html');
@@ -203,43 +192,32 @@ await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
 const port = server.address().port;
 
 const browser = await chromium.launch();
-const page = await browser.newPage({ viewport: { width: 560, height: 540 } });
-const manifest = [];
+const page = await browser.newPage({ viewport: { width: 640, height: 540 } });
 
+const wrapWidthByStyle = { lite: 620, compact: 620, full: 740 };
 for (const style of styles) {
-  for (const layout of layouts) {
-    await page.goto(
-      `http://127.0.0.1:${port}/?style=${style}&layout=${layout}`,
-      {
-        waitUntil: 'load',
-      },
-    );
-    await page.waitForFunction(
-      () => {
-        const card = document.getElementById('card');
-        const svg = card?.shadowRoot?.querySelector('svg');
-        return svg && svg.innerHTML.length > 100;
-      },
-      { timeout: 20000 },
-    );
-    await page.waitForTimeout(800);
-    const filename = `loads8-${style}-${layout}.png`;
-    const out = path.join(artifacts, filename);
-    await page.screenshot({ path: out });
-    manifest.push({
-      file: out,
-      style,
-      layout,
-      description: LAYOUT_META[layout],
-    });
-    console.log('saved', out);
-  }
+  const wrapW = wrapWidthByStyle[style] ?? 620;
+  await page.setViewportSize({
+    width: wrapW + 24,
+    height: 540,
+  });
+  await page.goto(`http://127.0.0.1:${port}/?style=${style}`, {
+    waitUntil: 'load',
+  });
+  await page.locator('#wrap').evaluate((el, w) => {
+    el.style.width = `${w}px`;
+  }, wrapW);
+  await page
+    .locator('sunsynk-power-flow-card')
+    .locator('svg')
+    .first()
+    .waitFor({ state: 'attached', timeout: 20000 });
+  await page.waitForTimeout(800);
+  const filename = `loads8-grid-${style}.png`;
+  const out = path.join(artifacts, filename);
+  await page.locator('#wrap').screenshot({ path: out });
+  console.log('saved', out);
 }
-
-fs.writeFileSync(
-  path.join(artifacts, 'loads8-layout-manifest.json'),
-  JSON.stringify(manifest, null, 2),
-);
 
 await browser.close();
 server.close();

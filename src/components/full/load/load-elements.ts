@@ -12,6 +12,10 @@ import { createTextWithPopup, renderText } from '../../../helpers/text-utils';
 import { renderIcon } from '../../../helpers/render-icon';
 import { renderPath } from '../../../helpers/render-path';
 import { renderCircle } from '../../../helpers/render-circle';
+import {
+	FULL_LOAD_COL_X,
+	FULL_LOAD_ROW_Y,
+} from '../../shared/load/extended-load-layout';
 
 export const renderLoadElements = (
 	data: DataDto,
@@ -61,45 +65,121 @@ export const renderLoadElements = (
 
 	const showSideLoads =
 		config.wide || !config.load.show_aux ? 'inline' : 'none';
-	const stackLoads78 = config.load.loads_7_8_layout === 'stack-right';
-	const fullLoad7Pos = stackLoads78
-		? {
-				rx: 413,
-				ry: 268,
-				tx: config.wide ? 416 : 445,
-				ty: 297,
-				px: 421,
-				py: 243,
-				vy: 279,
-			}
-		: {
-				rx: 376,
-				ry: 268,
-				tx: config.wide ? 379 : 408,
-				ty: 297,
-				px: 384,
-				py: 243,
-				vy: 279,
-			};
-	const fullLoad8Pos = stackLoads78
-		? {
-				rx: 413,
-				ry: 298,
-				tx: config.wide ? 416 : 445,
-				ty: 327,
-				px: 421,
-				py: 273,
-				vy: 309,
-			}
-		: {
-				rx: 413,
-				ry: 268,
-				tx: config.wide ? 416 : 445,
-				ty: 297,
-				px: 421,
-				py: 243,
-				vy: 279,
-			};
+	const fullLoadCell = (loadIndex: 5 | 6 | 7 | 8, col: number, row: number) => {
+		const rx = FULL_LOAD_COL_X[col];
+		const ry = FULL_LOAD_ROW_Y[row];
+		const align = config.wide ? 'st3 st8 left-align' : 'st3 st8 right-align';
+		const tx = config.wide ? rx + 3 : rx + 32;
+		const nameY = row === 0 ? 59 : 178;
+		const powerY = row === 0 ? 41 : 160;
+		const extraY = row === 0 ? 70 : 190;
+		const iconY = row === 0 ? 5 : 123;
+		const names = {
+			5: load5_name,
+			6: load6_name,
+			7: load7_name,
+			8: load8_name,
+		};
+		const switches = {
+			5: load5_switch,
+			6: load6_switch,
+			7: load7_switch,
+			8: load8_switch,
+		};
+		const colours = {
+			5: dynamicColourEssentialLoad5,
+			6: dynamicColourEssentialLoad6,
+			7: dynamicColourEssentialLoad7,
+			8: dynamicColourEssentialLoad8,
+		};
+		const icons = {
+			5: data.iconEssentialLoad5,
+			6: data.iconEssentialLoad6,
+			7: data.iconEssentialLoad7,
+			8: data.iconEssentialLoad8,
+		};
+		const states = {
+			5: data.stateEssentialLoad5,
+			6: data.stateEssentialLoad6,
+			7: data.stateEssentialLoad7,
+			8: data.stateEssentialLoad8,
+		};
+		const stateExtras = {
+			5: data.stateEssentialLoad5Extra,
+			6: data.stateEssentialLoad6Extra,
+			7: data.stateEssentialLoad7Extra,
+			8: data.stateEssentialLoad8Extra,
+		};
+		const entities = {
+			5: 'essential_load5',
+			6: 'essential_load6',
+			7: 'essential_load7',
+			8: 'essential_load8',
+		} as const;
+		const entitiesExtra = {
+			5: 'essential_load5_extra',
+			6: 'essential_load6_extra',
+			7: 'essential_load7_extra',
+			8: 'essential_load8_extra',
+		} as const;
+		return html`
+			<rect
+				id="es-load${loadIndex}"
+				x="${rx}"
+				y="${ry}"
+				width="35"
+				height="20"
+				rx="4.5"
+				ry="4.5"
+				fill="none"
+				stroke="${colours[loadIndex]}"
+				pointer-events="all"
+				display="${additionalLoad >= loadIndex ? 'inline' : 'none'}"
+			/>
+			${renderText(
+				`ess-load${loadIndex}`,
+				tx,
+				nameY,
+				additionalLoad >= loadIndex,
+				align,
+				colours[loadIndex],
+				names[loadIndex],
+			)}
+			<g display="${additionalLoad >= loadIndex ? 'inline' : 'none'}">
+				${renderIcon(
+					switches[loadIndex],
+					icons[loadIndex],
+					`essload${loadIndex}-small-icon`,
+					rx + 8,
+					iconY,
+				)}
+			</g>
+			${createTextWithPopup(
+				`ess_load${loadIndex}_value_extra`,
+				tx,
+				extraY,
+				!!config.entities?.[entitiesExtra[loadIndex]] &&
+					additionalLoad >= loadIndex &&
+					!showAux &&
+					(config.wide || row === 0) &&
+					stateExtras[loadIndex].isValid(),
+				config.wide ? 'st3 left-align' : 'st3 right-align',
+				colours[loadIndex],
+				`${Utils.formatNumberLocale(stateExtras[loadIndex].toNum(1), 1)} ${stateExtras[loadIndex]?.getUOM()}`,
+				(e) => Utils.handlePopup(e, config.entities[entitiesExtra[loadIndex]]),
+			)}
+			${createTextWithPopup(
+				`ess_load${loadIndex}_value`,
+				rx + 17,
+				powerY,
+				additionalLoad >= loadIndex && states[loadIndex].isValid(),
+				'st3',
+				colours[loadIndex],
+				states[loadIndex].toPowerString(auto_scale, decimalPlaces),
+				(e) => Utils.handlePopup(e, config.entities[entities[loadIndex]]),
+			)}
+		`;
+	};
 
 	return html`
 		<!-- Load Elements -->
@@ -109,269 +189,6 @@ export const renderLoadElements = (
 			x="${config.wide ? '30%' : '3%'}"
 			y="2.5%"
 		>
-			<svg
-				id="es-load5"
-				style="overflow: visible; display: ${
-					additionalLoad >= 5 ? showSideLoads : 'none'
-				};"
-				x="${config.wide ? '5%' : '-15.25%'}"
-			>
-				<rect
-					id="es-load5"
-					x="413"
-					y="30"
-					width="35"
-					height="20"
-					rx="4.5"
-					ry="4.5"
-					fill="none"
-					stroke="${dynamicColourEssentialLoad5}"
-					pointer-events="all"
-					display="${additionalLoad >= 5 ? 'inline' : 'none'}"
-				/>
-				${renderText(
-					'ess-load5',
-					config.wide ? 416 : 445,
-					59,
-					additionalLoad >= 5,
-					config.wide ? 'st3 st8 left-align' : 'st3 st8 right-align',
-					dynamicColourEssentialLoad5,
-					load5_name,
-				)}
-				<g display="${additionalLoad >= 5 ? 'inline' : 'none'}">
-					${renderIcon(
-						load5_switch,
-						data.iconEssentialLoad5,
-						'essload5-small-icon',
-						421,
-						5,
-					)}
-				</g>
-				${createTextWithPopup(
-					'ess_load5_value_extra',
-					config.wide ? 416 : 445,
-					70,
-					!!config.entities?.essential_load5_extra &&
-						additionalLoad >= 5 &&
-						!showAux &&
-						data.stateEssentialLoad5Extra.isValid(),
-					config.wide ? 'st3 left-align' : 'st3 right-align',
-					dynamicColourEssentialLoad5,
-					`${Utils.formatNumberLocale(
-						data.stateEssentialLoad5Extra.toNum(1),
-						1,
-					)} ${data.stateEssentialLoad5Extra?.getUOM()}`,
-					(e) => Utils.handlePopup(e, config.entities.essential_load5_extra),
-				)}
-				${createTextWithPopup(
-					'ess_load5_value',
-					430,
-					41,
-					additionalLoad >= 5 && data.stateEssentialLoad5.isValid(),
-					'st3',
-					dynamicColourEssentialLoad5,
-					data.stateEssentialLoad5.toPowerString(auto_scale, decimalPlaces),
-					(e) => Utils.handlePopup(e, config.entities.essential_load5),
-				)}
-			</svg>
-			<svg
-				id="es-load6"
-				style="overflow: visible; display: ${
-					additionalLoad >= 6 ? showSideLoads : 'none'
-				};"
-				x="${config.wide ? '5%' : '-15.25%'}"
-			>
-				<rect
-					id="es-load6"
-					x="413"
-					y="149"
-					width="35"
-					height="20"
-					rx="4.5"
-					ry="4.5"
-					fill="none"
-					stroke="${dynamicColourEssentialLoad6}"
-					pointer-events="all"
-					display="${additionalLoad >= 6 ? 'inline' : 'none'}"
-				/>
-				${renderText(
-					'ess-load6',
-					config.wide ? 416 : 445,
-					178,
-					additionalLoad >= 6,
-					config.wide ? 'st3 st8 left-align' : 'st3 st8 right-align',
-					dynamicColourEssentialLoad6,
-					load6_name,
-				)}
-				<g display="${additionalLoad >= 6 ? 'inline' : 'none'}">
-					${renderIcon(
-						load6_switch,
-						data.iconEssentialLoad6,
-						'essload6-small-icon',
-						421,
-						123,
-					)}
-				</g>
-				${createTextWithPopup(
-					'ess_load6_value_extra',
-					config.wide ? 416 : 445,
-					190,
-					!!config.entities?.essential_load6_extra &&
-						additionalLoad >= 6 &&
-						!showAux &&
-						!!config.wide &&
-						data.stateEssentialLoad6Extra.isValid(),
-					config.wide ? 'st3 left-align' : 'st3 right-align',
-					dynamicColourEssentialLoad6,
-					`${Utils.formatNumberLocale(
-						data.stateEssentialLoad6Extra.toNum(1),
-						1,
-					)} ${data.stateEssentialLoad6Extra?.getUOM()}`,
-					(e) => Utils.handlePopup(e, config.entities.essential_load6_extra),
-				)}
-				${createTextWithPopup(
-					'ess_load6_value',
-					430,
-					160,
-					additionalLoad >= 6 && data.stateEssentialLoad6.isValid(),
-					'st3',
-					dynamicColourEssentialLoad6,
-					data.stateEssentialLoad6.toPowerString(auto_scale, decimalPlaces),
-					(e) => Utils.handlePopup(e, config.entities.essential_load6),
-				)}
-			</svg>
-			<svg
-				id="es-load7"
-				style="overflow: visible; display: ${
-					additionalLoad >= 7 ? showSideLoads : 'none'
-				};"
-				x="${config.wide ? '5%' : '-15.25%'}"
-			>
-				<rect
-					id="es-load7"
-					x="${fullLoad7Pos.rx}"
-					y="${fullLoad7Pos.ry}"
-					width="35"
-					height="20"
-					rx="4.5"
-					ry="4.5"
-					fill="none"
-					stroke="${dynamicColourEssentialLoad7}"
-					pointer-events="all"
-					display="${additionalLoad >= 7 ? 'inline' : 'none'}"
-				/>
-				${renderText(
-					'ess-load7',
-					fullLoad7Pos.tx,
-					fullLoad7Pos.ty,
-					additionalLoad >= 7,
-					config.wide ? 'st3 st8 left-align' : 'st3 st8 right-align',
-					dynamicColourEssentialLoad7,
-					load7_name,
-				)}
-				<g display="${additionalLoad >= 7 ? 'inline' : 'none'}">
-					${renderIcon(
-						load7_switch,
-						data.iconEssentialLoad7,
-						'essload7-small-icon',
-						fullLoad7Pos.px,
-						fullLoad7Pos.py,
-					)}
-				</g>
-				${createTextWithPopup(
-					'ess_load7_value_extra',
-					fullLoad7Pos.tx,
-					fullLoad7Pos.ty + 12,
-					!!config.entities?.essential_load7_extra &&
-						additionalLoad >= 7 &&
-						!showAux &&
-						!!config.wide &&
-						data.stateEssentialLoad7Extra.isValid(),
-					config.wide ? 'st3 left-align' : 'st3 right-align',
-					dynamicColourEssentialLoad7,
-					`${Utils.formatNumberLocale(
-						data.stateEssentialLoad7Extra.toNum(1),
-						1,
-					)} ${data.stateEssentialLoad7Extra?.getUOM()}`,
-					(e) => Utils.handlePopup(e, config.entities.essential_load7_extra),
-				)}
-				${createTextWithPopup(
-					'ess_load7_value',
-					fullLoad7Pos.px + (stackLoads78 ? 9 : 9),
-					fullLoad7Pos.vy,
-					additionalLoad >= 7 && data.stateEssentialLoad7.isValid(),
-					'st3',
-					dynamicColourEssentialLoad7,
-					data.stateEssentialLoad7.toPowerString(auto_scale, decimalPlaces),
-					(e) => Utils.handlePopup(e, config.entities.essential_load7),
-				)}
-			</svg>
-			<svg
-				id="es-load8"
-				style="overflow: visible; display: ${
-					additionalLoad >= 8 ? showSideLoads : 'none'
-				};"
-				x="${config.wide ? '5%' : '-15.25%'}"
-			>
-				<rect
-					id="es-load8"
-					x="${fullLoad8Pos.rx}"
-					y="${fullLoad8Pos.ry}"
-					width="35"
-					height="20"
-					rx="4.5"
-					ry="4.5"
-					fill="none"
-					stroke="${dynamicColourEssentialLoad8}"
-					pointer-events="all"
-					display="${additionalLoad >= 8 ? 'inline' : 'none'}"
-				/>
-				${renderText(
-					'ess-load8',
-					fullLoad8Pos.tx,
-					fullLoad8Pos.ty,
-					additionalLoad >= 8,
-					config.wide ? 'st3 st8 left-align' : 'st3 st8 right-align',
-					dynamicColourEssentialLoad8,
-					load8_name,
-				)}
-				<g display="${additionalLoad >= 8 ? 'inline' : 'none'}">
-					${renderIcon(
-						load8_switch,
-						data.iconEssentialLoad8,
-						'essload8-small-icon',
-						fullLoad8Pos.px,
-						fullLoad8Pos.py,
-					)}
-				</g>
-				${createTextWithPopup(
-					'ess_load8_value_extra',
-					fullLoad8Pos.tx,
-					fullLoad8Pos.ty + 12,
-					!!config.entities?.essential_load8_extra &&
-						additionalLoad >= 8 &&
-						!showAux &&
-						!!config.wide &&
-						data.stateEssentialLoad8Extra.isValid(),
-					config.wide ? 'st3 left-align' : 'st3 right-align',
-					dynamicColourEssentialLoad8,
-					`${Utils.formatNumberLocale(
-						data.stateEssentialLoad8Extra.toNum(1),
-						1,
-					)} ${data.stateEssentialLoad8Extra?.getUOM()}`,
-					(e) => Utils.handlePopup(e, config.entities.essential_load8_extra),
-				)}
-				${createTextWithPopup(
-					'ess_load8_value',
-					fullLoad8Pos.px + 9,
-					fullLoad8Pos.vy,
-					additionalLoad >= 8 && data.stateEssentialLoad8.isValid(),
-					'st3',
-					dynamicColourEssentialLoad8,
-					data.stateEssentialLoad8.toPowerString(auto_scale, decimalPlaces),
-					(e) => Utils.handlePopup(e, config.entities.essential_load8),
-				)}
-			</svg>
 			<rect
 				x="236"
 				y="103"
@@ -452,6 +269,13 @@ export const renderLoadElements = (
 					!showAux && [3, 4, 5, 6, 7, 8].includes(additionalLoad) ? '' : 'none'
 				}"
 			/>
+			<g
+				id="essential-load-extended"
+				style="display: ${additionalLoad >= 5 ? showSideLoads : 'none'};"
+			>
+				${fullLoadCell(5, 2, 0)} ${fullLoadCell(6, 2, 1)}
+				${fullLoadCell(7, 3, 0)} ${fullLoadCell(8, 3, 1)}
+			</g>
 
 			${renderText(
 				'essential_name',

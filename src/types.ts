@@ -224,8 +224,6 @@ export interface sunsynkPowerFlowCardConfig extends LovelaceCardConfig {
 		navigate: string;
 		invert_flow: boolean;
 		label_daily_load: string;
-		/** Layout for essential loads 7–8 when additional_loads is 7 or 8 (review / preview). */
-		loads_7_8_layout?: 'pair-row' | 'stack-right';
 	};
 	grid: {
 		colour: string;

@@ -46,6 +46,7 @@ import {
 	CustomEntity,
 } from './inverters/dto/custom-entity';
 import { icons } from './helpers/icons';
+import { extraEssentialLoadViewWidth } from './components/shared/load/extended-load-layout';
 
 console.groupCollapsed(
 	`%c ⚡ SUNSYNK-POWER-FLOW-CARD %c ${localize('common.version')}: ${CARD_VERSION} `,
@@ -2445,6 +2446,11 @@ export class SunsynkPowerFlowCard extends LitElement {
 			default:
 				viewBoxYLite = '0';
 				viewBoxHeightLite = '408';
+		}
+
+		const loadViewExtra = extraEssentialLoadViewWidth(additionalLoad);
+		if (loadViewExtra > 0) {
+			viewBoxWidthLite = String(Number(viewBoxWidthLite) + loadViewExtra);
 		}
 
 		// Center content when grid is hidden (Compact/Lite)
