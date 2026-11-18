@@ -188,12 +188,15 @@
       return `<g transform="translate(${x},${y}) scale(${s})"><path d="${d}" fill="${color}"/></g>`;
     }
 
-    function flow(d, color, id, dur = '2.4s', bus = false, noDot = false) {
+    function flow(d, color, id, dur = '2.4s', bus = false, noDot = false, hairline = false) {
       const dotR = dir === 'a' ? 4 : 2.5;
       const cap = bus ? 'flow-bus' : '';
       const dot = !noDot && (dir === 'a' || id.startsWith('flow-'))
         ? `<circle class="dot-glow" r="${dotR}" fill="${color}"><animateMotion dur="${dur}" repeatCount="indefinite"><mpath href="#${id}"/></animateMotion></circle>`
         : '';
+      if (hairline) {
+        return `<path class="flow-active" id="${id}" d="${d}" stroke="${color}" stroke-width="${dir === 'a' ? 2.5 : 0.75}" opacity="0.88"/>${dot}`;
+      }
       return `<path class="flow-track ${cap}" d="${d}" stroke="${color}"/>
         <path class="flow-active ${cap}" id="${id}" d="${d}" stroke="${color}"/>${dot}`;
     }
@@ -274,8 +277,8 @@
     const flowIds = [];
     const flowEdges = [];
 
-    function addFlow(d, color, id, dur = '2.4s', bus = false, noDot = false, edge = null) {
-      flows.push(flow(d, color, id, dur, bus, noDot));
+    function addFlow(d, color, id, dur = '2.4s', bus = false, noDot = false, edge = null, hairline = false) {
+      flows.push(flow(d, color, id, dur, bus, noDot, hairline));
       flowIds.push(id);
       if (edge) flowEdges.push({ pathId: id, ...edge });
     }
@@ -301,7 +304,7 @@
 
     const gOut = ringAt(GRID.cx, GRID.cy, GRID.r, 0);
     const ctIn = ringAt(GRIDCT.cx, GRIDCT.cy, GRIDCT.r, 180);
-    addFlow(`M ${gOut.x} ${gOut.y} L ${ctIn.x} ${ctIn.y}`, pal.grid, 'flow-grid-ct', '3.1s', false, true, { from: 'grid', to: 'gridct' });
+    addFlow(`M ${gOut.x} ${gOut.y} L ${ctIn.x} ${ctIn.y}`, pal.grid, 'flow-grid-ct', '3.1s', false, true, { from: 'grid', to: 'gridct' }, true);
     const ctOut = ringAt(GRIDCT.cx, GRIDCT.cy, GRIDCT.r, 0);
     const invGridIn = ringAt(INV.x, INV.y, INV.r, 180);
     addFlow(
@@ -323,11 +326,9 @@
 
     const homeEast = ringAt(HOME.x, HOME.y, HOME.r, 0);
     addFlow(
-      `M ${homeEast.x} ${homeEast.y} C ${homeEast.x + 56} ${homeEast.y} ${BUS_X0 - 36} ${BUS_Y} ${BUS_X0} ${BUS_Y}`,
-      pal.load, 'flow-home-bus', '2.1s', false, false, { from: 'home', to: 'bus' },
+      `M ${homeEast.x} ${homeEast.y} C ${homeEast.x + 56} ${homeEast.y} ${BUS_X0 - 36} ${BUS_Y} ${BUS_X0} ${BUS_Y} L ${BUS_X1} ${BUS_Y}`,
+      pal.load, 'flow-home-bus', '2.1s', true, false, { from: 'home', to: 'bus-end' },
     );
-
-    addFlow(`M ${BUS_X0} ${BUS_Y} L ${BUS_X1} ${BUS_Y}`, pal.load, 'flow-bus', '2.8s', true, false, { from: 'bus', to: 'bus-end' });
 
     LOADS.forEach((l) => {
       const tip = l.cy < BUS_Y ? ringAt(l.cx, l.cy, LR, 90) : ringAt(l.cx, l.cy, LR, -90);
@@ -351,7 +352,7 @@
       nodes += luminousNode(GRIDCT.cx, GRIDCT.cy, GRIDCT.r, pal.grid, 'grid', 'gridct');
       labels += pill(GRID.cx - 4, GRID.cy - GRID.r - 34, '100', 'W', 'Grid import', pal.grid, 'end');
       nodes += luminousNode(INV.x, INV.y, INV.r, pal.inv, 'inv', 'inv');
-      labels += pill(INV.x - 10, INV.y + INV.r + 8, '4.50', 'kW', 'Inverter', pal.inv, 'end');
+      labels += pill(INV.x - INV.r - 6, INV.y + 10, '4.50', 'kW', 'Inverter', pal.inv, 'end');
       nodes += luminousNode(HOME.x, HOME.y, HOME.r, pal.load, 'home', 'home');
       nodes += `<g id="battery" transform="translate(${BATT.cx},${BATT.cy})">
         <circle r="${socR + 8}" fill="${nodeFill}" stroke="none"/>
