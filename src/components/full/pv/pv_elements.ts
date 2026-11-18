@@ -34,9 +34,9 @@ export const renderSolarElements = (
 		<!-- Solar Elements -->
 		<svg
 			id="Solar"
-			style="overflow: visible; display: ${
-				!config.show_solar ? 'none' : 'inline'
-			};"
+			style="overflow: visible; display: ${!config.show_solar
+				? 'none'
+				: 'inline'};"
 			x="3%"
 			y="2.5%"
 		>
@@ -231,9 +231,8 @@ export const renderSolarElements = (
 				mppts === 1 ? 'st12' : '',
 				'1;0',
 			)}
-			${
-				config.solar?.navigate
-					? svg`
+			${config.solar?.navigate
+				? svg`
                     <a href="#" @click=${(e) => Utils.handleNavigation(e, config.solar.navigate)}>
                         <svg xmlns="http://www.w3.org/2000/svg" id="sun" x="0" y="-0.5" width="40" height="40"
                             viewBox="0 0 24 24">
@@ -241,13 +240,12 @@ export const renderSolarElements = (
                                 d="${icons.sun}"/>
                         </svg>
                     </a>`
-					: svg`
+				: svg`
                     <svg xmlns="http://www.w3.org/2000/svg" id="sun" x="0" y="-0.5" width="40" height="40"
                         viewBox="0 0 24 24">
                         <path fill="${solarColour}"
                             d="${icons.sun}"/>
-                    </svg>`
-			}
+                    </svg>`}
 			<a
 				href="#"
 				@click=${(e) => Utils.handlePopup(e, config.entities.solar_sell_247)}
@@ -262,15 +260,13 @@ export const renderSolarElements = (
 					viewBox="0 0 30 30"
 				>
 					<path
-						display="${
-							!config.entities.solar_sell_247 ||
-							config.entities.solar_sell_247 === 'none' ||
-							data.stateSolarSell.state === 'off' ||
-							data.stateSolarSell.state === '0' ||
-							!['1', 'on'].includes(data.stateSolarSell.state)
-								? 'none'
-								: ''
-						}"
+						display="${!config.entities.solar_sell_247 ||
+						config.entities.solar_sell_247 === 'none' ||
+						data.stateSolarSell.state === 'off' ||
+						data.stateSolarSell.state === '0' ||
+						!['1', 'on'].includes(data.stateSolarSell.state)
+							? 'none'
+							: ''}"
 						fill="${solarColour}"
 						d="${icons.solarSellOn}"
 					/>
@@ -285,15 +281,13 @@ export const renderSolarElements = (
 					viewBox="0 0 30 30"
 				>
 					<path
-						display="${
-							!config.entities.solar_sell_247 ||
-							config.entities.solar_sell_247 === 'none' ||
-							data.stateSolarSell.state === 'on' ||
-							data.stateSolarSell.state === '1' ||
-							!['0', 'off'].includes(data.stateSolarSell.state)
-								? 'none'
-								: ''
-						}"
+						display="${!config.entities.solar_sell_247 ||
+						config.entities.solar_sell_247 === 'none' ||
+						data.stateSolarSell.state === 'on' ||
+						data.stateSolarSell.state === '1' ||
+						!['0', 'off'].includes(data.stateSolarSell.state)
+							? 'none'
+							: ''}"
 						fill="${solarColour}"
 						d="${icons.solarSellOff}"
 					/>
@@ -329,9 +323,8 @@ export const renderSolarElements = (
 				`${data.stateDayPVEnergy.toPowerString(true, data.decimalPlacesEnergy)} / ${data.totalSolarGeneration}`,
 				(e) => Utils.handlePopup(e, config.entities.day_pv_energy_108),
 			)}
-			${
-				config.entities?.pv_total
-					? svg`
+			${config.entities?.pv_total
+				? svg`
                     ${createTextWithPopup(
 											'pvtotal_power',
 											87,
@@ -347,7 +340,7 @@ export const renderSolarElements = (
 											(e) => Utils.handlePopup(e, config.entities.pv_total),
 											true,
 										)}`
-					: svg`
+				: svg`
                     ${renderText(
 											'pvtotal_power',
 											87,
@@ -361,8 +354,7 @@ export const renderSolarElements = (
 													: `${Utils.convertValue(totalPV, decimalPlaces) || 0}`
 												: `${Utils.toNum(totalPV || 0, 0)} ${UnitOfPower.WATT}`,
 											true,
-										)}`
-			}
+										)}`}
 			${createTextWithPopup(
 				'pv1_power_186',
 				36.5,

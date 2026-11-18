@@ -169,11 +169,9 @@ export const renderInverterElements = (
 					viewBox="0 0 24 24"
 				>
 					<path
-						display="${
-							data.stateUseTimer.state == 'on' && enableTimer !== 'no'
-								? ''
-								: 'none'
-						}"
+						display="${data.stateUseTimer.state == 'on' && enableTimer !== 'no'
+							? ''
+							: 'none'}"
 						fill="${inverterColour}"
 						d="${icons.timerOn}"
 					/>
@@ -188,11 +186,9 @@ export const renderInverterElements = (
 					viewBox="0 0 24 24"
 				>
 					<path
-						display="${
-							data.stateUseTimer.state == 'off' && enableTimer !== 'no'
-								? ''
-								: 'none'
-						}"
+						display="${data.stateUseTimer.state == 'off' && enableTimer !== 'no'
+							? ''
+							: 'none'}"
 						fill="${inverterColour}"
 						d="${icons.timerOff}"
 					/>
@@ -230,11 +226,10 @@ export const renderInverterElements = (
 					viewBox="0 0 24 24"
 				>
 					<path
-						display="${
-							priorityLoad === 'off' && (priorityLoad !== 'no' || !priorityLoad)
-								? ''
-								: 'none'
-						}"
+						display="${priorityLoad === 'off' &&
+						(priorityLoad !== 'no' || !priorityLoad)
+							? ''
+							: 'none'}"
 						fill="${inverterColour}"
 						d="${icons.priorityLoadOff}"
 					/>
@@ -249,11 +244,10 @@ export const renderInverterElements = (
 					viewBox="0 0 24 24"
 				>
 					<path
-						display="${
-							priorityLoad === 'on' && (priorityLoad !== 'no' || !priorityLoad)
-								? ''
-								: 'none'
-						}"
+						display="${priorityLoad === 'on' &&
+						(priorityLoad !== 'no' || !priorityLoad)
+							? ''
+							: 'none'}"
 						fill="${inverterColour}"
 						d="${icons.priorityLoadOn}"
 					/>
@@ -277,21 +271,19 @@ export const renderInverterElements = (
 					localize('common.priority_batt'),
 				)}
 			</a>
-			${
-				config.inverter?.navigate
-					? svg`
+			${config.inverter?.navigate
+				? svg`
                     <a href="#" @click=${(e) => Utils.handleNavigation(e, config.inverter.navigate)}>
                         <image x="155" y="224.75" width="53" height="72"
                             class="${!data.genericInverterImage ? '' : 'st12'}"
                             href="${inverterImg}"
                             preserveAspectRatio="none"/>
                     </a>`
-					: svg`
+				: svg`
                     <image x="155" y="224.75" width="53" height="72"
                         class="${!data.genericInverterImage ? '' : 'st12'}"
                         href="${inverterImg}"
-                        preserveAspectRatio="none"/>`
-			}
+                        preserveAspectRatio="none"/>`}
 			<a
 				href="#"
 				@click=${(e) => Utils.handlePopup(e, data.inverterProg.entityID)}
@@ -306,18 +298,14 @@ export const renderInverterElements = (
 					viewBox="0 0 24 24"
 				>
 					<path
-						display="${
-							data.inverterProg.show === false || enableTimer === 'no'
-								? 'none'
-								: ''
-						}"
-						class="${
-							data.inverterProg.charge === 'none' ||
-							(data.stateUseTimer.state != 'off' &&
-								data.stateUseTimer.state != 'on')
-								? 'st12'
-								: ''
-						}"
+						display="${data.inverterProg.show === false || enableTimer === 'no'
+							? 'none'
+							: ''}"
+						class="${data.inverterProg.charge === 'none' ||
+						(data.stateUseTimer.state != 'off' &&
+							data.stateUseTimer.state != 'on')
+							? 'st12'
+							: ''}"
 						fill="${inverterColour}"
 						d="${icons.progGridOn}"
 					/>
@@ -332,18 +320,14 @@ export const renderInverterElements = (
 					viewBox="0 0 24 24"
 				>
 					<path
-						display="${
-							data.inverterProg.show === false || enableTimer === 'no'
-								? 'none'
-								: ''
-						}"
-						class="${
-							data.inverterProg.charge === 'none' &&
-							(data.stateUseTimer.state === 'off' ||
-								data.stateUseTimer.state === 'on')
-								? ''
-								: 'st12'
-						}"
+						display="${data.inverterProg.show === false || enableTimer === 'no'
+							? 'none'
+							: ''}"
+						class="${data.inverterProg.charge === 'none' &&
+						(data.stateUseTimer.state === 'off' ||
+							data.stateUseTimer.state === 'on')
+							? ''
+							: 'st12'}"
 						fill="${inverterColour}"
 						d="${icons.progGridOff}"
 					/>
