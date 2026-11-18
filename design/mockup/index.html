@@ -230,20 +230,20 @@
 
     const flows = LOADS.map((l, i) => {
       const cy = l.y;
-      const d = `M ${HUB.x + 32} ${HUB.y} L ${BUS_X} ${HUB.y} L ${BUS_X} ${cy} Q ${l.x - 40} ${cy} ${l.x - 32} ${cy}`;
+      const d = `M ${HUB.x + 36} ${HUB.y} C ${BUS_X - 12} ${HUB.y} ${BUS_X} ${(HUB.y + cy) / 2} ${BUS_X} ${cy} C ${(BUS_X + l.x) / 2} ${cy} ${l.x - 48} ${cy} ${l.x - 34} ${cy}`;
       const dur = `${1.6 + (l.w / 800)}s`;
       return flowPath(d, palette.load, `flow-${l.id}`, dur);
     }).join('');
 
-    const trunk = `<path class="flow-track" d="M ${HUB.x} ${HUB.y} L ${BUS_X} ${HUB.y} L ${BUS_X} ${trunkTop} L ${BUS_X} ${trunkBot}" stroke="${palette.load}"/>
-      <path class="flow-active" id="flow-trunk" d="M ${HUB.x} ${HUB.y} L ${BUS_X} ${HUB.y} L ${BUS_X} ${trunkTop} L ${BUS_X} ${trunkBot}" stroke="${palette.load}"/>
+    const trunk = `<path class="flow-track" d="M ${HUB.x + 28} ${HUB.y} C ${HUB.x + 70} ${HUB.y} ${BUS_X - 8} ${HUB.y} ${BUS_X} ${HUB.y} L ${BUS_X} ${trunkTop + 8} L ${BUS_X} ${trunkBot - 8}" stroke="${palette.load}"/>
+      <path class="flow-active" id="flow-trunk" d="M ${HUB.x + 28} ${HUB.y} C ${HUB.x + 70} ${HUB.y} ${BUS_X - 8} ${HUB.y} ${BUS_X} ${HUB.y} L ${BUS_X} ${trunkTop + 8} L ${BUS_X} ${trunkBot - 8}" stroke="${palette.load}"/>
       <circle class="dot-glow" r="4" fill="${palette.load}"><animateMotion dur="2s" repeatCount="indefinite"><mpath href="#flow-trunk"/></animateMotion></circle>`;
 
     const pvFlows = `
-      ${flowPath(`M 300 128 L 392 200 L ${HUB.x} ${HUB.y}`, palette.solar, 'flow-pv1', '2.2s')}
-      ${flowPath(`M 420 128 L 392 200 L ${HUB.x} ${HUB.y}`, palette.solar, 'flow-pv2', '2.5s')}
-      ${flowPath(`M ${HUB.x} ${HUB.y} L 140 ${HUB.y}`, palette.grid, 'flow-grid', '3s')}
-      ${flowPath(`M ${HUB.x} ${HUB.y + 40} L ${HUB.x} 392`, palette.battery, 'flow-bat', '2.8s')}
+      ${flowPath(`M 300 132 C 320 168 360 200 ${HUB.x} ${HUB.y - 8}`, palette.solar, 'flow-pv1', '2.2s')}
+      ${flowPath(`M 420 132 C 400 168 375 200 ${HUB.x} ${HUB.y - 8}`, palette.solar, 'flow-pv2', '2.5s')}
+      ${flowPath(`M ${HUB.x - 36} ${HUB.y} C 280 ${HUB.y} 180 ${HUB.y} 140 ${HUB.y}`, palette.grid, 'flow-grid', '3s')}
+      ${flowPath(`M ${HUB.x} ${HUB.y + 36} C ${HUB.x} 300 ${HUB.x} 350 ${HUB.x} 354`, palette.battery, 'flow-bat', '2.8s')}
     `;
 
     const socR = 38;
@@ -279,7 +279,7 @@
       <!-- Grid left -->
       ${ringNode(108, 248, 36, palette.grid, 'grid', 'node-grid')}
       ${valuePill(108, 296, '100', 'W', 'Grid import', palette.grid)}
-      <text x="108" y="318" text-anchor="middle" class="label" fill="${palette.textMuted}">Autarky 70%</text>
+      <text x="108" y="332" text-anchor="middle" class="label" fill="${palette.textMuted}">Autarky 70%</text>
 
       <!-- Inverter centre -->
       ${ringNode(HUB.x, HUB.y, 40, palette.inv, 'inv', 'node-inv')}
