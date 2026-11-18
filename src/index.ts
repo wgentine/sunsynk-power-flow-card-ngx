@@ -46,6 +46,7 @@ import {
 	CustomEntity,
 } from './inverters/dto/custom-entity';
 import { icons } from './helpers/icons';
+import { extraEssentialLoadViewWidth } from './components/shared/load/extended-load-layout';
 
 console.groupCollapsed(
 	`%c ⚡ SUNSYNK-POWER-FLOW-CARD %c ${localize('common.version')}: ${CARD_VERSION} `,
@@ -565,6 +566,8 @@ export class SunsynkPowerFlowCard extends LitElement {
 		const stateEssentialLoad4 = this.getEntity('entities.essential_load4');
 		const stateEssentialLoad5 = this.getEntity('entities.essential_load5');
 		const stateEssentialLoad6 = this.getEntity('entities.essential_load6');
+		const stateEssentialLoad7 = this.getEntity('entities.essential_load7');
+		const stateEssentialLoad8 = this.getEntity('entities.essential_load8');
 		const stateAuxConnectedStatus = this.getEntity(
 			'entities.aux_connected_status',
 			{ state: 'on' },
@@ -588,6 +591,12 @@ export class SunsynkPowerFlowCard extends LitElement {
 		);
 		const stateEssentialLoad6Extra = this.getEntity(
 			'entities.essential_load6_extra',
+		);
+		const stateEssentialLoad7Extra = this.getEntity(
+			'entities.essential_load7_extra',
+		);
+		const stateEssentialLoad8Extra = this.getEntity(
+			'entities.essential_load8_extra',
 		);
 		const stateLoadPowerL1 = this.getEntity('entities.load_power_L1');
 		const stateLoadPowerL2 = this.getEntity('entities.load_power_L2');
@@ -709,6 +718,10 @@ export class SunsynkPowerFlowCard extends LitElement {
 			Utils.toNum(config.load?.load5_max_threshold, 0) || Infinity;
 		const Load6MaxThreshold =
 			Utils.toNum(config.load?.load6_max_threshold, 0) || Infinity;
+		const Load7MaxThreshold =
+			Utils.toNum(config.load?.load7_max_threshold, 0) || Infinity;
+		const Load8MaxThreshold =
+			Utils.toNum(config.load?.load8_max_threshold, 0) || Infinity;
 		const dynamicColourEssentialLoad1 =
 			this.calculateEssentialLoadColour(
 				stateEssentialLoad1.toPower(false),
@@ -744,6 +757,18 @@ export class SunsynkPowerFlowCard extends LitElement {
 				stateEssentialLoad6.toPower(false),
 				threshold,
 				Load6MaxThreshold,
+			) || loadColour;
+		const dynamicColourEssentialLoad7 =
+			this.calculateEssentialLoadColour(
+				stateEssentialLoad7.toPower(false),
+				threshold,
+				Load7MaxThreshold,
+			) || loadColour;
+		const dynamicColourEssentialLoad8 =
+			this.calculateEssentialLoadColour(
+				stateEssentialLoad8.toPower(false),
+				threshold,
+				Load8MaxThreshold,
 			) || loadColour;
 
 		config.title_colour = this.colourConvert(config.title_colour);
@@ -887,7 +912,9 @@ export class SunsynkPowerFlowCard extends LitElement {
 		let additionalLoad = config.load?.additional_loads;
 		const invalidLoad =
 			!validLoadValues.includes(additionalLoad) ||
-			(this.isFullCard && [3, 4, 5, 6].includes(additionalLoad) && showAux) ||
+			(this.isFullCard &&
+				[3, 4, 5, 6, 7, 8].includes(additionalLoad) &&
+				showAux) ||
 			(this.isFullCard && additionalLoad === 3) ||
 			(this.isCompactCard &&
 				!config.wide &&
@@ -923,6 +950,12 @@ export class SunsynkPowerFlowCard extends LitElement {
 		}).state;
 		const iconEssentialLoad6 = this.getEntity('load.load6_icon', {
 			state: config.load?.load6_icon?.toString() ?? '',
+		}).state;
+		const iconEssentialLoad7 = this.getEntity('load.load7_icon', {
+			state: config.load?.load7_icon?.toString() ?? '',
+		}).state;
+		const iconEssentialLoad8 = this.getEntity('load.load8_icon', {
+			state: config.load?.load8_icon?.toString() ?? '',
 		}).state;
 		const iconAuxLoad1 = this.getEntity('load.aux_load1_icon', {
 			state: config.load?.aux_load1_icon?.toString() ?? '',
@@ -2415,6 +2448,11 @@ export class SunsynkPowerFlowCard extends LitElement {
 				viewBoxHeightLite = '408';
 		}
 
+		const loadViewExtra = extraEssentialLoadViewWidth(additionalLoad);
+		if (loadViewExtra > 0) {
+			viewBoxWidthLite = String(Number(viewBoxWidthLite) + loadViewExtra);
+		}
+
 		// Center content when grid is hidden (Compact/Lite)
 		if (!config.show_grid && config?.center_no_grid) {
 			let defX = 50;
@@ -2451,6 +2489,8 @@ export class SunsynkPowerFlowCard extends LitElement {
 			4: [stateEssentialLoad1, stateEssentialLoad2],
 			5: [stateEssentialLoad1, stateEssentialLoad2, stateEssentialLoad5],
 			6: [stateEssentialLoad1, stateEssentialLoad2, stateEssentialLoad5],
+			7: [stateEssentialLoad1, stateEssentialLoad2, stateEssentialLoad5],
+			8: [stateEssentialLoad1, stateEssentialLoad2, stateEssentialLoad5],
 		};
 		const liteCompactLoads2 = {
 			2: [stateEssentialLoad2],
@@ -2458,6 +2498,19 @@ export class SunsynkPowerFlowCard extends LitElement {
 			4: [stateEssentialLoad3, stateEssentialLoad4],
 			5: [stateEssentialLoad3, stateEssentialLoad4],
 			6: [stateEssentialLoad3, stateEssentialLoad4, stateEssentialLoad6],
+			7: [
+				stateEssentialLoad3,
+				stateEssentialLoad4,
+				stateEssentialLoad6,
+				stateEssentialLoad7,
+			],
+			8: [
+				stateEssentialLoad3,
+				stateEssentialLoad4,
+				stateEssentialLoad6,
+				stateEssentialLoad7,
+				stateEssentialLoad8,
+			],
 		};
 
 		// Mapping for Full cards
@@ -2467,11 +2520,26 @@ export class SunsynkPowerFlowCard extends LitElement {
 			4: [stateEssentialLoad1, stateEssentialLoad2],
 			5: [stateEssentialLoad1, stateEssentialLoad2, stateEssentialLoad5],
 			6: [stateEssentialLoad1, stateEssentialLoad2, stateEssentialLoad5],
+			7: [stateEssentialLoad1, stateEssentialLoad2, stateEssentialLoad5],
+			8: [stateEssentialLoad1, stateEssentialLoad2, stateEssentialLoad5],
 		};
 		const fullCardLoads2 = {
 			4: [stateEssentialLoad3, stateEssentialLoad4],
 			5: [stateEssentialLoad3, stateEssentialLoad4],
 			6: [stateEssentialLoad3, stateEssentialLoad4, stateEssentialLoad6],
+			7: [
+				stateEssentialLoad3,
+				stateEssentialLoad4,
+				stateEssentialLoad6,
+				stateEssentialLoad7,
+			],
+			8: [
+				stateEssentialLoad3,
+				stateEssentialLoad4,
+				stateEssentialLoad6,
+				stateEssentialLoad7,
+				stateEssentialLoad8,
+			],
 		};
 
 		// Function to determine load color
@@ -2583,6 +2651,8 @@ export class SunsynkPowerFlowCard extends LitElement {
 			stateEssentialLoad4,
 			stateEssentialLoad5,
 			stateEssentialLoad6,
+			stateEssentialLoad7,
+			stateEssentialLoad8,
 			gridPower,
 			gridPowerL2,
 			gridPowerL3,
@@ -2594,6 +2664,8 @@ export class SunsynkPowerFlowCard extends LitElement {
 			stateEssentialLoad4Extra,
 			stateEssentialLoad5Extra,
 			stateEssentialLoad6Extra,
+			stateEssentialLoad7Extra,
+			stateEssentialLoad8Extra,
 			stateNonEssentialLoad1Extra,
 			stateNonEssentialLoad2Extra,
 			stateNonEssentialLoad3Extra,
@@ -2675,6 +2747,8 @@ export class SunsynkPowerFlowCard extends LitElement {
 			iconEssentialLoad4,
 			iconEssentialLoad5,
 			iconEssentialLoad6,
+			iconEssentialLoad7,
+			iconEssentialLoad8,
 			enableTimer,
 			stateSolarSell,
 			priorityLoad,
@@ -2755,6 +2829,8 @@ export class SunsynkPowerFlowCard extends LitElement {
 			dynamicColourEssentialLoad4,
 			dynamicColourEssentialLoad5,
 			dynamicColourEssentialLoad6,
+			dynamicColourEssentialLoad7,
+			dynamicColourEssentialLoad8,
 			dynamicColourNonEssentialLoad1,
 			dynamicColourNonEssentialLoad2,
 			dynamicColourNonEssentialLoad3,
@@ -2797,6 +2873,8 @@ export class SunsynkPowerFlowCard extends LitElement {
 					load4_name: resolveLoadName(config.load.load4_name),
 					load5_name: resolveLoadName(config.load.load5_name),
 					load6_name: resolveLoadName(config.load.load6_name),
+					load7_name: resolveLoadName(config.load.load7_name),
+					load8_name: resolveLoadName(config.load.load8_name),
 				}
 			: config.load;
 

@@ -229,6 +229,12 @@
       "bat1": "Bateria 1",
       "bat2": "Bateria 2"
     },
-    "disable_animations": "Disable Flow Animations"
+    "disable_animations": "Disable Flow Animations",
+    "load7_name": "Nazwa obciążenia 7",
+    "load8_name": "Nazwa obciążenia 8",
+    "load7_icon": "Ikona obciążenia 7",
+    "load8_icon": "Ikona obciążenia 8",
+    "load7_max_threshold": "Maksymalny próg obciążenia 7",
+    "load8_max_threshold": "Maksymalny próg obciążenia 8"
   }
 }

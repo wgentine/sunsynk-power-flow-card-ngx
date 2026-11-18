@@ -9,6 +9,7 @@ import { renderGridElements } from '../components/full/grid/grid-elements';
 import { renderLoadElements } from '../components/full/load/load-elements';
 import { renderAuxLoadElements } from '../components/full/auxload/aux-elements';
 import { renderInverterElements } from '../components/full/inverter/inverter-elements';
+import { extraEssentialLoadViewWidth } from '../components/shared/load/extended-load-layout';
 
 export const fullCard = (
 	config: sunsynkPowerFlowCardConfig,
@@ -23,8 +24,9 @@ export const fullCard = (
 				keyed(
 					titleKey,
 					html`<h1
-						style="text-align: center; color: ${config.title_colour ||
-						'inherit'}; font-size: ${config.title_size || '32px'};"
+						style="text-align: center; color: ${
+							config.title_colour || 'inherit'
+						}; font-size: ${config.title_size || '32px'};"
 					>
 						${config.title}
 					</h1>`,
@@ -37,7 +39,7 @@ export const fullCard = (
 			<div class="container card">
 				${titleTemplate}
 				<svg
-					viewBox="${config.wide ? '0 0 720 405' : '0 0 483 405'}"
+					viewBox="${config.wide ? '0 0 720 405' : `0 0 ${483 + extraEssentialLoadViewWidth(data.additionalLoad)} 405`}"
 					preserveAspectRatio="xMidYMid meet"
 					height="${data.cardHeight}"
 					width="${data.cardWidth}"

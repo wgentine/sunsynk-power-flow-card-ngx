@@ -12,6 +12,10 @@ import { getCompactLayoutIconConfigs } from '../../shared/load/icon-configs';
 import { createTextWithPopup, renderText } from '../../../helpers/text-utils';
 import { renderPath } from '../../../helpers/render-path';
 import { renderCircle } from '../../../helpers/render-circle';
+import {
+	COMPACT_LOAD_COL_X,
+	COMPACT_LOAD_ROW_Y,
+} from '../../shared/load/extended-load-layout';
 
 export const renderLoadElements = (
 	data: DataDto,
@@ -26,6 +30,8 @@ export const renderLoadElements = (
 		dynamicColourEssentialLoad4,
 		dynamicColourEssentialLoad5,
 		dynamicColourEssentialLoad6,
+		dynamicColourEssentialLoad7,
+		dynamicColourEssentialLoad8,
 		decimalPlaces,
 		loadColour,
 		flowColour,
@@ -48,8 +54,133 @@ export const renderLoadElements = (
 		load5_switch,
 		load6_name,
 		load6_switch,
+		load7_name,
+		load7_switch,
+		load8_name,
+		load8_switch,
 		dynamic_colour,
 	} = config.load;
+
+	const showCompactExtendedLoads =
+		config.wide || (!config.wide && [1, 2, 3].includes(config.solar.mppts));
+	const compactExtCol = (col: number) => COMPACT_LOAD_COL_X[col];
+	const compactLoadCell = (
+		loadIndex: 5 | 6 | 7 | 8,
+		col: number,
+		row: number,
+	) => {
+		const rx = compactExtCol(col);
+		const ry = COMPACT_LOAD_ROW_Y[row];
+		const tx = rx + (row === 0 ? 33 : 33);
+		const nameY = ry + 29;
+		const powerY = ry + 11;
+		const extraY = ry + (row === 0 ? 40 : 42);
+		const iconY = row === 0 ? ry - 26 : ry - 26;
+		const names = {
+			5: load5_name,
+			6: load6_name,
+			7: load7_name,
+			8: load8_name,
+		};
+		const switches = {
+			5: load5_switch,
+			6: load6_switch,
+			7: load7_switch,
+			8: load8_switch,
+		};
+		const colours = {
+			5: dynamicColourEssentialLoad5,
+			6: dynamicColourEssentialLoad6,
+			7: dynamicColourEssentialLoad7,
+			8: dynamicColourEssentialLoad8,
+		};
+		const icons = {
+			5: data.iconEssentialLoad5,
+			6: data.iconEssentialLoad6,
+			7: data.iconEssentialLoad7,
+			8: data.iconEssentialLoad8,
+		};
+		const states = {
+			5: data.stateEssentialLoad5,
+			6: data.stateEssentialLoad6,
+			7: data.stateEssentialLoad7,
+			8: data.stateEssentialLoad8,
+		};
+		const stateExtras = {
+			5: data.stateEssentialLoad5Extra,
+			6: data.stateEssentialLoad6Extra,
+			7: data.stateEssentialLoad7Extra,
+			8: data.stateEssentialLoad8Extra,
+		};
+		const entities = {
+			5: 'essential_load5',
+			6: 'essential_load6',
+			7: 'essential_load7',
+			8: 'essential_load8',
+		};
+		const entitiesExtra = {
+			5: 'essential_load5_extra',
+			6: 'essential_load6_extra',
+			7: 'essential_load7_extra',
+			8: 'essential_load8_extra',
+		};
+		const align = col >= 2 ? 'right-align' : 'left-align';
+		return svg`<g id="essential-load-${loadIndex}">
+			<rect
+				id="es-load${loadIndex}"
+				x="${rx}"
+				y="${ry}"
+				width="35"
+				height="20"
+				rx="4.5"
+				ry="4.5"
+				fill="none"
+				stroke="${colours[loadIndex]}"
+				pointer-events="all"
+				display="${additionalLoad >= loadIndex ? '' : 'none'}"
+			/>
+			${renderText(
+				`es-load${loadIndex}`,
+				tx,
+				nameY,
+				additionalLoad >= loadIndex,
+				`st3 st8 ${align}`,
+				colours[loadIndex],
+				names[loadIndex],
+			)}
+			<g display="${additionalLoad >= loadIndex ? '' : 'none'}">
+				${renderIcon(
+					switches[loadIndex],
+					icons[loadIndex],
+					`essload${loadIndex}-small-icon`,
+					rx + 7,
+					iconY,
+				)}
+			</g>
+			${createTextWithPopup(
+				`ess_load${loadIndex}_extra`,
+				tx,
+				extraY,
+				!!config.entities?.[entitiesExtra[loadIndex]] &&
+					additionalLoad >= loadIndex &&
+					stateExtras[loadIndex].isValid(),
+				`st3 ${align}`,
+				colours[loadIndex],
+				`${Utils.formatNumberLocale(stateExtras[loadIndex].toNum(1), 1)} ${stateExtras[loadIndex]?.getUOM()}`,
+				(e) => Utils.handlePopup(e, config.entities[entitiesExtra[loadIndex]]),
+			)}
+			${createTextWithPopup(
+				`ess_load${loadIndex}`,
+				rx + 18,
+				powerY,
+				additionalLoad >= loadIndex && states[loadIndex].isValid(),
+				'st3',
+				colours[loadIndex],
+				states[loadIndex]?.toPowerString(auto_scale, decimalPlaces),
+				(e) => Utils.handlePopup(e, config.entities[entities[loadIndex]]),
+			)}
+		</g>`;
+	};
 
 	return html`
 		<!-- Load Elements -->
@@ -115,7 +246,7 @@ export const renderLoadElements = (
 					(e) => Utils.handlePopup(e, config.entities.essential_load1_extra),
 				)}
 				<g
-					display="${[0, 4, 5, 6].includes(additionalLoad) ? 'none' : 'inline'}"
+					display="${[0, 4, 5, 6, 7, 8].includes(additionalLoad) ? 'none' : 'inline'}"
 				>
 					${renderIcon(
 						load1_switch,
@@ -523,145 +654,17 @@ export const renderLoadElements = (
 					data.stateEssentialLoad4?.toPowerString(auto_scale, decimalPlaces),
 					(e) => Utils.handlePopup(e, config.entities.essential_load4),
 				)}
-			</svg>
-			<svg
-				id="Esential-Load5"
-				style="overflow: visible; display: ${[5, 6].includes(additionalLoad)
-					? config.wide ||
-						(!config.wide && [1, 2, 3].includes(config.solar.mppts))
-						? 'inline'
-						: 'none'
-					: `none`};"
-				x="${config.wide ? '-5%' : '-7.35%'}"
-			>
-				<rect
-					id="es-load5"
-					x="405"
-					y="107"
-					width="35"
-					height="20"
-					rx="4.5"
-					ry="4.5"
-					fill="none"
-					stroke="${data.dynamicColourEssentialLoad5}"
-					pointer-events="all"
-					display="${[5, 6].includes(additionalLoad) ? 'inline' : 'none'}"
-				/>
-				${renderText(
-					'es-load5',
-					437,
-					136,
-					[5, 6].includes(additionalLoad),
-					'st3 st8 right-align',
-					dynamicColourEssentialLoad5,
-					load5_name,
-				)}
-				<g display="${[5, 6].includes(additionalLoad) ? 'inline' : 'none'}">
-					${renderIcon(
-						load5_switch,
-						data.iconEssentialLoad5,
-						'essload5-small-icon',
-						412,
-						81,
-					)}
-				</g>
-				${createTextWithPopup(
-					'ess_load5_extra',
-					437,
-					147,
-					!!config.entities?.essential_load5_extra &&
-						[5, 6].includes(additionalLoad) &&
-						data.stateEssentialLoad5Extra.isValid(),
-					'st3 right-align',
-					dynamicColourEssentialLoad5,
-					`${Utils.formatNumberLocale(
-						data.stateEssentialLoad5Extra.toNum(1),
-						1,
-					)} ${data.stateEssentialLoad5Extra?.getUOM()}`,
-					(e) => Utils.handlePopup(e, config.entities.essential_load5_extra),
-				)}
-				${createTextWithPopup(
-					'ess_load5',
-					423,
-					118,
-					[5, 6].includes(additionalLoad) && data.stateEssentialLoad5.isValid(),
-					'st3',
-					dynamicColourEssentialLoad5,
-					data.stateEssentialLoad5?.toPowerString(auto_scale, decimalPlaces),
-					(e) => Utils.handlePopup(e, config.entities.essential_load5),
-				)}
-			</svg>
-			<svg
-				id="Esential-Load6"
-				style="overflow: visible; display: ${[6].includes(additionalLoad)
-					? config.wide ||
-						(!config.wide && [1, 2, 3].includes(config.solar.mppts))
-						? 'inline'
-						: 'none'
-					: `none`};"
-				x="${config.wide ? '-5%' : '-7.35%'}"
-			>
-				<rect
-					id="es-load6"
-					x="405"
-					y="290"
-					width="35"
-					height="20"
-					rx="4.5"
-					ry="4.5"
-					fill="none"
-					stroke="${data.dynamicColourEssentialLoad6}"
-					pointer-events="all"
-					display="${additionalLoad === 6 ? 'inline' : 'none'}"
-				/>
-				${renderText(
-					'es-load6',
-					437,
-					320,
-					additionalLoad === 6,
-					'st3 st8 right-align',
-					dynamicColourEssentialLoad6,
-					load6_name,
-				)}
-				<g display="${additionalLoad === 6 ? 'inline' : 'none'}">
-					${renderIcon(
-						load6_switch,
-						data.iconEssentialLoad6,
-						'essload6-small-icon',
-						412,
-						264,
-					)}
-				</g>
-				${createTextWithPopup(
-					'ess_load6_extra',
-					437,
-					332,
-					!!config.entities?.essential_load6_extra &&
-						additionalLoad === 6 &&
-						data.stateEssentialLoad6Extra.isValid(),
-					'st3 right-align',
-					dynamicColourEssentialLoad6,
-					`${Utils.formatNumberLocale(
-						data.stateEssentialLoad6Extra.toNum(1),
-						1,
-					)} ${data.stateEssentialLoad6Extra?.getUOM()}`,
-					(e) => Utils.handlePopup(e, config.entities.essential_load6_extra),
-				)}
-				${createTextWithPopup(
-					'ess_load6',
-					423,
-					301,
-					additionalLoad === 6 && data.stateEssentialLoad6.isValid(),
-					'st3',
-					dynamicColourEssentialLoad6,
-					data.stateEssentialLoad6?.toPowerString(auto_scale, decimalPlaces),
-					(e) => Utils.handlePopup(e, config.entities.essential_load6),
-				)}
+				${
+					additionalLoad >= 5 && showCompactExtendedLoads
+						? svg`${compactLoadCell(5, 2, 0)} ${compactLoadCell(6, 2, 1)}
+								${compactLoadCell(7, 3, 0)} ${compactLoadCell(8, 3, 1)}`
+						: ''
+				}
 			</svg>
 			${renderText(
 				'daily_load',
-				[2, 3, 4, 5, 6].includes(additionalLoad) ? '365' : '412',
-				[2, 3, 4, 5, 6].includes(additionalLoad) ? '189' : '282.1',
+				[2, 3, 4, 5, 6, 7, 8].includes(additionalLoad) ? '365' : '412',
+				[2, 3, 4, 5, 6, 7, 8].includes(additionalLoad) ? '189' : '282.1',
 				!data.loadShowDaily,
 				'st3 left-align',
 				loadColour,
@@ -687,8 +690,9 @@ export const renderLoadElements = (
 						}${auto_scale ? '' : ` ${UnitOfPower.WATT}`}`
 					: '0',
 			)}
-			${config.inverter.three_phase && config.entities?.load_power_L1
-				? svg`<a
+			${
+				config.inverter.three_phase && config.entities?.load_power_L1
+					? svg`<a
 							href="#"
 							@click=${(e: Event) => Utils.handlePopup(e, config.entities.load_power_L1)}
 						>
@@ -701,9 +705,11 @@ export const renderLoadElements = (
 								pointer-events="all"
 							/>
 						</a>`
-				: ''}
-			${config.inverter.three_phase && config.entities?.load_power_L2
-				? svg`<a
+					: ''
+			}
+			${
+				config.inverter.three_phase && config.entities?.load_power_L2
+					? svg`<a
 							href="#"
 							@click=${(e: Event) => Utils.handlePopup(e, config.entities.load_power_L2)}
 						>
@@ -716,9 +722,11 @@ export const renderLoadElements = (
 								pointer-events="all"
 							/>
 						</a>`
-				: ''}
-			${config.inverter.three_phase && config.entities?.load_power_L3
-				? svg`<a
+					: ''
+			}
+			${
+				config.inverter.three_phase && config.entities?.load_power_L3
+					? svg`<a
 							href="#"
 							@click=${(e: Event) => Utils.handlePopup(e, config.entities.load_power_L3)}
 						>
@@ -731,7 +739,8 @@ export const renderLoadElements = (
 								pointer-events="all"
 							/>
 						</a>`
-				: ''}
+					: ''
+			}
 			<svg id="load-flow">
 				${renderPath(
 					'es-line',
@@ -816,22 +825,24 @@ export const renderLoadElements = (
 			${renderPath(
 				'es-load1',
 				'M 441 180 L 441 147',
-				[2, 3, 4, 5, 6].includes(additionalLoad),
+				[2, 3, 4, 5, 6, 7, 8].includes(additionalLoad),
 				data.load1Colour,
 				1,
 			)}
 			${renderPath(
 				'es-load2',
 				'M 441 290 L 441 257',
-				[2, 3, 4, 5, 6].includes(additionalLoad),
+				[2, 3, 4, 5, 6, 7, 8].includes(additionalLoad),
 				data.load2Colour,
 				1,
 			)}
 			<a
 				href="#"
-				@click=${config.load?.navigate
-					? (e) => Utils.handleNavigation(e, config.load.navigate)
-					: null}
+				@click=${
+					config.load?.navigate
+						? (e) => Utils.handleNavigation(e, config.load.navigate)
+						: null
+				}
 			>
 				<svg
 					id="essen"
@@ -851,31 +862,35 @@ export const renderLoadElements = (
 						>
 							<stop
 								offset="0%"
-								stop-color="${data.gridPercentage > 0
-									? data.gridColour
-									: data.batteryPercentage > 0
-										? batteryColour
-										: solarColour}"
+								stop-color="${
+									data.gridPercentage > 0
+										? data.gridColour
+										: data.batteryPercentage > 0
+											? batteryColour
+											: solarColour
+								}"
 							/>
 							<stop
 								offset="${data.gridPercentage}%"
-								stop-color="${data.gridPercentage > 0
-									? data.gridColour
-									: data.batteryPercentage > 0
-										? batteryColour
-										: solarColour}"
+								stop-color="${
+									data.gridPercentage > 0
+										? data.gridColour
+										: data.batteryPercentage > 0
+											? batteryColour
+											: solarColour
+								}"
 							/>
 							<stop
 								offset="${data.gridPercentage}%"
-								stop-color="${data.batteryPercentage > 0
-									? batteryColour
-									: solarColour}"
+								stop-color="${
+									data.batteryPercentage > 0 ? batteryColour : solarColour
+								}"
 							/>
 							<stop
 								offset="${data.gridPercentage + data.batteryPercentage}%"
-								stop-color="${data.batteryPercentage > 0
-									? batteryColour
-									: solarColour}"
+								stop-color="${
+									data.batteryPercentage > 0 ? batteryColour : solarColour
+								}"
 							/>
 							<stop
 								offset="${data.gridPercentage + data.batteryPercentage}%"
@@ -892,8 +907,8 @@ export const renderLoadElements = (
 			</a>
 			${createTextWithPopup(
 				'daily_load_value',
-				[2, 3, 4, 5, 6].includes(additionalLoad) ? '365' : '412',
-				[2, 3, 4, 5, 6].includes(additionalLoad) ? '175' : '267.9',
+				[2, 3, 4, 5, 6, 7, 8].includes(additionalLoad) ? '365' : '412',
+				[2, 3, 4, 5, 6, 7, 8].includes(additionalLoad) ? '175' : '267.9',
 				!data.loadShowDaily || !data.stateDayLoadEnergy.isValid(),
 				'st10 left-align',
 				loadColour,
@@ -901,9 +916,10 @@ export const renderLoadElements = (
 				(e) => Utils.handlePopup(e, config.entities.day_load_energy_84),
 				true,
 			)}
-			${config.entities?.essential_power &&
-			config.entities.essential_power !== 'none'
-				? svg`
+			${
+				config.entities?.essential_power &&
+				config.entities.essential_power !== 'none'
+					? svg`
                     ${createTextWithPopup(
 											'ess_power',
 											340.1,
@@ -917,7 +933,7 @@ export const renderLoadElements = (
 											(e) =>
 												Utils.handlePopup(e, config.entities.essential_power),
 										)}`
-				: svg`
+					: svg`
                     ${renderText(
 											'ess_power',
 											340.1,
@@ -928,7 +944,8 @@ export const renderLoadElements = (
 											auto_scale
 												? `${Utils.convertValue(essentialPower, decimalPlaces) || 0}`
 												: `${essentialPower || 0} ${UnitOfPower.WATT}`,
-										)}`}
+										)}`
+			}
 			${guard(
 				[
 					data.additionalLoad,

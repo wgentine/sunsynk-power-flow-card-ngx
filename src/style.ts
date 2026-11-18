@@ -124,6 +124,16 @@ export const getDynamicStyles = (data) => html`
 			--mdc-icon-size: 20px;
 		}
 
+		.essload7-small-icon {
+			color: ${data.dynamicColourEssentialLoad7} !important;
+			--mdc-icon-size: 20px;
+		}
+
+		.essload8-small-icon {
+			color: ${data.dynamicColourEssentialLoad8} !important;
+			--mdc-icon-size: 20px;
+		}
+
 		.grid-icon {
 			color: ${data.customGridIconColour} !important;
 			--mdc-icon-size: 64px;

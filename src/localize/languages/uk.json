@@ -239,6 +239,14 @@
       "bat1": "Батарея 1",
       "bat2": "Батарея 2"
     },
-    "disable_animations": "Disable Flow Animations"
+    "disable_animations": "Disable Flow Animations",
+    "load7_name": "Назва споживача 7",
+    "load8_name": "Назва споживача 8",
+    "load7_icon": "Значок споживача 7",
+    "load8_icon": "Значок споживача 8",
+    "load7_max_threshold": "Поріг споживача 7",
+    "load8_max_threshold": "Поріг споживача 8",
+    "load7_switch": "Вимикач споживача 7",
+    "load8_switch": "Вимикач споживача 8"
   }
 }

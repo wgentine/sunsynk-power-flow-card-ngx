@@ -229,6 +229,12 @@
       "bat1": "Battery 1",
       "bat2": "Battery 2"
     },
-    "disable_animations": "Disable Flow Animations"
+    "disable_animations": "Disable Flow Animations",
+    "load7_name": "Load 7 Name",
+    "load8_name": "Load 8 Name",
+    "load7_icon": "Load 7 Icon",
+    "load8_icon": "Load 8 Icon",
+    "load7_max_threshold": "Load 7 Max Threshold",
+    "load8_max_threshold": "Load 8 Max Threshold"
   }
 }

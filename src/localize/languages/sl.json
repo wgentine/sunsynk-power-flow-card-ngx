@@ -219,6 +219,10 @@
       "gri": "entitete omrežja",
       "sensor": "neobvezni senzorji"
     },
-    "disable_animations": "Disable Flow Animations"
+    "disable_animations": "Disable Flow Animations",
+    "load7_name": "ime obremenitve 7",
+    "load8_name": "ime obremenitve 8",
+    "load7_icon": "ikona obremenitve 7",
+    "load8_icon": "ikona obremenitve 8"
   }
 }

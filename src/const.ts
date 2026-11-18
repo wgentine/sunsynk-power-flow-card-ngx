@@ -2,7 +2,16 @@ import { version } from '../package.json';
 
 export const CARD_VERSION = version;
 
-export const validLoadValues = [0, 1, 2, 3, 4, 5, 6];
+export const MAX_ESSENTIAL_LOADS = 8;
+export const validLoadValues = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+/** Essential load counts that use the split top-row layout (loads 1–2 boxes). */
+export const ESSENTIAL_LOADS_TWO_BOX_TOP = [2, 4, 5, 6, 7, 8];
+/** Essential load counts that use the bottom-row pair (loads 3–4) on full card. */
+export const ESSENTIAL_LOADS_FOUR_OR_MORE = [4, 5, 6, 7, 8];
+/** Essential load counts that use the side-column loads 5+. */
+export const ESSENTIAL_LOADS_FIVE_OR_MORE = [5, 6, 7, 8];
+/** Essential load counts that include dedicated loads 5+6 in compact/lite layout offsets. */
+export const ESSENTIAL_LOADS_MULTI_SIDE = [2, 3, 4, 5, 6, 7, 8];
 export const validnonLoadValues = [0, 1, 2, 3];
 export const valid3phase = [true, false];
 export const validaux = [true, false];
