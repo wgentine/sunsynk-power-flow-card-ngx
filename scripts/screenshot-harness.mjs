@@ -1,3 +1,4 @@
+/* eslint-env node */
 /**
  * Renders 8 essential loads per card style and layout option; saves PNGs to artifacts.
  */
