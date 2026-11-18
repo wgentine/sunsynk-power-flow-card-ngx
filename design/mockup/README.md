@@ -26,5 +26,8 @@ Outputs (2× DPR):
 - `/opt/cursor/artifacts/mockup-b-light.png`
 - `/opt/cursor/artifacts/mockup-a-flow-dark.webm`
 - `/opt/cursor/artifacts/mockup-a-flow-dark.gif`
+- `/opt/cursor/artifacts/mockup-a-dark-junction-*.png` (ring-crop QA)
+
+Flows are trimmed to each node’s outer ring (`ringIn` / `ringOut`) and masked so strokes and animated dots never paint inside circles. Node fills are opaque in direction A.
 
 Topology: PV (2 strings) top · grid left · inverter centre · battery bottom · 8 essential load circles right · non-essential + grid meter bottom-right.

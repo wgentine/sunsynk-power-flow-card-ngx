@@ -90,6 +90,32 @@ if (videos[0]) {
   }
 }
 
+// Junction QA crops (direction A dark, 4× zoom on key rings)
+const crops = [
+  ['junction-pv-trunk', { x: 250, y: 40, width: 180, height: 200 }],
+  ['junction-inv-grid', { x: 60, y: 180, width: 380, height: 140 }],
+  ['junction-inv-battery', { x: 330, y: 200, width: 140, height: 220 }],
+  ['junction-home-bus', { x: 450, y: 130, width: 200, height: 150 }],
+  ['junction-load-stub', { x: 600, y: 60, width: 100, height: 130 }],
+  ['junction-gridct', { x: 70, y: 350, width: 820, height: 120 }],
+];
+await page.goto(`${base}?dir=a&theme=dark`, { waitUntil: 'networkidle' });
+await page.waitForTimeout(400);
+const cardBox = await page.locator('.card').boundingBox();
+for (const [name, rel] of crops) {
+  const out = path.join(artifacts, `mockup-a-dark-${name}.png`);
+  await page.screenshot({
+    path: out,
+    clip: {
+      x: cardBox.x + rel.x,
+      y: cardBox.y + rel.y,
+      width: rel.width,
+      height: rel.height,
+    },
+  });
+  console.log('saved', out);
+}
+
 await context.close();
 await browser.close();
 server.close();

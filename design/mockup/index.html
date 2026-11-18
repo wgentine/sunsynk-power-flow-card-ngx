@@ -19,81 +19,48 @@
       justify-content: center;
       padding: 24px;
     }
-    body[data-theme="dark"] {
-      background: #0b0c0f;
-      color: #e8eaed;
-    }
-    body[data-theme="light"] {
-      background: #eef1f6;
-      color: #14181f;
-    }
-  body[data-dir="a"] { --card-radius: 24px; }
-  body[data-dir="b"] { --card-radius: 16px; }
+    body[data-theme="dark"] { background: #0b0c0f; color: #e8eaed; }
+    body[data-theme="light"] { background: #eef1f6; color: #14181f; }
 
-    .card {
-      width: 920px;
-      height: 520px;
-      position: relative;
-    }
+    .card { width: 920px; height: 520px; position: relative; }
     body[data-theme="dark"][data-dir="a"] .card {
       background: linear-gradient(165deg, #14161c 0%, #0f1115 55%, #12151b 100%);
-      border-radius: var(--card-radius);
-      box-shadow:
-        0 0 0 1px rgba(255,255,255,0.06),
-        0 24px 80px rgba(0,0,0,0.55);
+      border-radius: 24px;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 24px 80px rgba(0,0,0,0.55);
     }
     body[data-theme="light"][data-dir="a"] .card {
-      background: linear-gradient(180deg, #ffffff 0%, #f6f8fb 100%);
-      border-radius: var(--card-radius);
-      box-shadow:
-        0 0 0 1px rgba(15,17,21,0.06),
-        0 20px 60px rgba(15,17,21,0.08);
+      background: linear-gradient(180deg, #fff 0%, #f6f8fb 100%);
+      border-radius: 24px;
+      box-shadow: 0 0 0 1px rgba(15,17,21,0.06), 0 20px 60px rgba(15,17,21,0.08);
     }
     body[data-theme="dark"][data-dir="b"] .card {
       background: #0f1115;
-      border-radius: var(--card-radius);
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+      border-radius: 12px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
     }
     body[data-theme="light"][data-dir="b"] .card {
-      background: #fafbfc;
-      border-radius: var(--card-radius);
-      box-shadow: inset 0 0 0 1px rgba(15,17,21,0.1);
+      background: #f8f9fc;
+      border-radius: 12px;
+      box-shadow: inset 0 0 0 1px rgba(15,17,21,0.08);
     }
-
-    svg.mock {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-    .tabular { font-variant-numeric: tabular-nums; }
-    .muted { opacity: 0.55; font-size: 10px; font-weight: 500; }
-    .value { font-size: 13px; font-weight: 600; letter-spacing: -0.02em; }
-    .label { font-size: 10px; font-weight: 500; fill: currentColor; opacity: 0.5; }
-
-    .flow-track { fill: none; stroke-width: 3; opacity: 0.12; stroke-linecap: round; }
-    body[data-dir="b"] .flow-track { stroke-width: 2; opacity: 0.18; }
-
-    .flow-active { fill: none; stroke-width: 2.5; stroke-linecap: round; opacity: 0.85; }
-    body[data-dir="b"] .flow-active { stroke-width: 1.5; opacity: 0.9; stroke-dasharray: none; }
-
-    .dot-glow { filter: url(#dotGlow); }
-    body[data-dir="b"] .dot-glow { filter: none; }
-
-    @keyframes pulse-ring {
-      0%, 100% { opacity: 0.35; }
-      50% { opacity: 0.65; }
-    }
+    svg.mock { width: 100%; height: 100%; display: block; }
+    .flow-track { fill: none; stroke-linecap: butt; stroke-linejoin: round; }
+    .flow-active { fill: none; stroke-linecap: butt; stroke-linejoin: round; }
+    .flow-bus { stroke-linecap: round; }
+    body[data-dir="a"] .flow-track { stroke-width: 3; opacity: 0.14; }
+    body[data-dir="a"] .flow-active { stroke-width: 2.5; opacity: 0.88; }
+    body[data-dir="b"] .flow-track { stroke-width: 1; opacity: 0.22; }
+    body[data-dir="b"] .flow-active { stroke-width: 0.75; opacity: 0.7; }
+    body[data-dir="a"] .dot-glow { filter: url(#dotGlow); }
+    @keyframes pulse-ring { 0%, 100% { opacity: 0.35; } 50% { opacity: 0.65; } }
     body[data-dir="a"] .node-ring-outer { animation: pulse-ring 4s ease-in-out infinite; }
   </style>
 </head>
 <body data-dir="a" data-theme="dark">
-  <div class="card" id="card">
-    <svg class="mock" viewBox="0 0 920 520" id="diagram" aria-label="Power flow mockup"></svg>
-  </div>
+  <div class="card"><svg class="mock" viewBox="0 0 940 520" id="diagram"></svg></div>
   <script>
-    const params = new URLSearchParams(location.search);
-    const dir = params.get('dir') === 'b' ? 'b' : 'a';
-    const theme = params.get('theme') === 'light' ? 'light' : 'dark';
+    const dir = new URLSearchParams(location.search).get('dir') === 'b' ? 'b' : 'a';
+    const theme = new URLSearchParams(location.search).get('theme') === 'light' ? 'light' : 'dark';
     document.body.dataset.dir = dir;
     document.body.dataset.theme = theme;
 
@@ -103,208 +70,323 @@
       home: 'M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z',
       homeOut: 'M12 5.69L17 10.19V18H15V12H9V18H7V10.19L12 5.69M12 3L2 12H5V20H11V14H13V20H19V12H22',
       inv: 'M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z',
-      ev: 'M19.77,7.23L19.78,7.22L16.06,3.5L15,4.56L17.11,6.67C16.17,7.03 15.5,7.93 15.5,9A2.5,2.5 0 0,0 18,11.5C18.36,11.5 18.69,11.42 19,11.29V18.5A1,1 0 0,1 18,19.5A1,1 0 0,1 17,18.5V14A2,2 0 0,0 15,12H14V5A2,2 0 0,0 12,3H6A2,2 0 0,0 4,5V21H14V13.5H15.5V18.5A2.5,2.5 0 0,0 18,21A2.5,2.5 0 0,0 20.5,18.5V9C20.5,8.31 20.22,7.68 19.77,7.23M8,18V13.5H6L10,6V11H12L8,18Z',
+      battery: 'M16.67,4H15V2H9V4H7.33A1.33,1.33 0 0,0 6,5.33V20.67C6,21.4 6.6,22 7.33,22H16.67A1.33,1.33 0 0,0 18,20.67V5.33C18,4.6 17.4,4 16.67,4M11,20V14.5H9L13,7V12.5H15',
+      ev: 'M19.77,7.23L16.06,3.5L15,4.56L17.11,6.67C16.17,7.03 15.5,7.93 15.5,9A2.5,2.5 0 0,0 18,11.5M8,18V13.5H6L10,6V11H12L8,18Z',
       hw: 'M8 2C6.89 2 6 2.89 6 4V16C6 17.11 6.89 18 8 18H9V20H6V22H9C10.11 22 11 21.11 11 20V18H13V20C13 21.11 13.89 22 15 22H18V20H15V18H16C17.11 18 18 17.11 18 16V4C18 2.89 17.11 2 16 2H8M12 4.97A2 2 0 0 1 14 6.97A2 2 0 0 1 12 8.97A2 2 0 0 1 10 6.97A2 2 0 0 1 12 4.97M10 14.5H14V16H10V14.5Z',
       kitchen: 'M6,14H8L11,17H9L6,14M20,6H4V10H20V6M4,19H20V12H4V19M13,14H15L18,17H16L13,14Z',
       office: 'M3 6H21C21.55 6 22 6.45 22 7C22 7.55 21.55 8 21 8V19H19V17H15V19H13V8H5V19H3V8C2.45 8 2 7.55 2 7C2 6.45 2.45 6 3 6Z',
       pool: 'M2,15C3.67,14.25 5.33,13.5 7,13.17V5A3,3 0 0,1 10,2C11.31,2 12.42,2.83 12.83,4H10A1,1 0 0,0 9,5V6H14V5A3,3 0 0,1 17,2C18.31,2 19.42,2.83 19.83,4H17A1,1 0 0,0 16,5V14.94C18,14.62 20,13 22,13V15M14,8H9V10H14V8',
       shed: 'M12 3L2 12H5V20H19V12H22L12 3M11.5 18V14H9L12.5 7V11H15L11.5 18Z',
       garage: 'M19,20H17V11H7V20H5V9L12,5L19,9V20M8,12H16V14H8V12',
-      shop: 'M13.78 15.3L19.78 21.3L21.89 19.14L15.89 13.14L13.78 15.3M17.5 10.1C17.11 10.1 16.69 10.05 16.36 9.91L4.97 21.25L2.86 19.14L10.27 11.74L8.5 9.96L7.78 10.66L6.33 9.25V12.11L5.63 12.81L2.11 9.25L2.81 8.55H5.62L4.22 7.14L7.78 3.58C12 3.58L9.89 5.74L11.3 7.14L10.59 7.85L12.38 9.63L14.2 7.75C17.5 10.1 17.5 10.1Z',
+      shop: 'M13.78 15.3L19.78 21.3L21.89 19.14L15.89 13.14L13.78 15.3M17.5 10.1L4.97 21.25L2.86 19.14L10.27 11.74L17.5 10.1Z',
     };
 
-    const palette = theme === 'dark'
+    const pal = theme === 'dark'
       ? {
-          solar: '#f5a524',
-          battery: '#3ecf8e',
-          grid: dir === 'b' ? '#9b87f5' : '#5b9fd4',
-          load: '#4ecdc4',
-          inv: '#9aa3b2',
-          text: '#e8eaed',
-          textMuted: '#8b939e',
-          surface: dir === 'a' ? 'rgba(255,255,255,0.05)' : 'transparent',
-          surfaceHi: dir === 'a' ? 'rgba(255,255,255,0.09)' : 'transparent',
-          ring: dir === 'a' ? 0.45 : 0.35,
+          solar: '#f5a524', battery: '#3ecf8e', grid: dir === 'b' ? '#a78bfa' : '#5b9fd4',
+          load: '#4ecdc4', inv: '#9aa3b2', text: '#e8eaed', muted: '#8b939e',
+          surface: dir === 'a' ? 'rgba(255,255,255,0.08)' : 'transparent',
+          surfaceHi: dir === 'a' ? 'rgba(255,255,255,0.12)' : 'transparent',
+          gridLine: dir === 'b' ? 'rgba(255,255,255,0.04)' : 'transparent',
         }
       : {
-          solar: '#d48806',
-          battery: '#16a34a',
-          grid: dir === 'b' ? '#7c5cff' : '#3b82c4',
-          load: '#0d9488',
-          inv: '#64748b',
-          text: '#14181f',
-          textMuted: '#64748b',
-          surface: dir === 'a' ? 'rgba(255,255,255,0.85)' : 'transparent',
+          solar: '#d48806', battery: '#16a34a', grid: dir === 'b' ? '#7c5cff' : '#3b82c4',
+          load: '#0d9488', inv: '#64748b', text: '#14181f', muted: '#64748b',
+          surface: dir === 'a' ? 'rgba(255,255,255,0.92)' : 'transparent',
           surfaceHi: dir === 'a' ? '#ffffff' : 'transparent',
-          ring: dir === 'a' ? 0.35 : 0.4,
+          gridLine: dir === 'b' ? 'rgba(15,17,21,0.06)' : 'transparent',
         };
 
+    const INV = { x: 388, y: 246, r: 40 };
+    const HOME = { x: 478, y: 246, r: 26 };
+    const BUS_Y = 172;
+    const BUS_X0 = 548;
+    const BUS_X1 = 818;
+    const MERGE_X = 352;
+    const TRUNK_TOP = INV.y - INV.r - 2;
+
     const LOADS = [
-      { id: 1, x: 645, y: 88, w: 350, icon: 'ev', name: 'EV charger' },
-      { id: 2, x: 725, y: 88, w: 400, icon: 'hw', name: 'Hot water' },
-      { id: 5, x: 805, y: 88, w: 550, icon: 'pool', name: 'Pool' },
-      { id: 7, x: 885, y: 88, w: 650, icon: 'garage', name: 'Garage' },
-      { id: 3, x: 645, y: 248, w: 450, icon: 'kitchen', name: 'Kitchen' },
-      { id: 4, x: 725, y: 248, w: 500, icon: 'office', name: 'Office' },
-      { id: 6, x: 805, y: 248, w: 600, icon: 'shed', name: 'Shed' },
-      { id: 8, x: 885, y: 248, w: 700, icon: 'shop', name: 'Workshop' },
+      { id: 1, cx: 628, cy: 96, w: 350, icon: 'ev', name: 'EV charger' },
+      { id: 2, cx: 708, cy: 96, w: 400, icon: 'hw', name: 'Hot water' },
+      { id: 5, cx: 788, cy: 96, w: 550, icon: 'pool', name: 'Pool' },
+      { id: 7, cx: 848, cy: 96, w: 650, icon: 'garage', name: 'Garage' },
+      { id: 3, cx: 628, cy: 252, w: 450, icon: 'kitchen', name: 'Kitchen' },
+      { id: 4, cx: 708, cy: 252, w: 500, icon: 'office', name: 'Office' },
+      { id: 6, cx: 788, cy: 252, w: 600, icon: 'shed', name: 'Shed' },
+      { id: 8, cx: 848, cy: 252, w: 700, icon: 'shop', name: 'Workshop' },
     ];
-
-    const BUS_X = 572;
-    const HUB = { x: 392, y: 248 };
+    const LR = 30;
     const SOC = 0.75;
+    const GRID = { cx: 112, cy: 246, r: 36 };
+    const NONESS = { cx: 752, cy: 418, r: 30 };
+    const GRIDCT = { cx: 842, cy: 418, r: 30 };
+    const socR = 36;
+    const BATT = { cx: INV.x, cy: 388, r: socR + 2 };
+    const PV1 = { cx: 284, cy: 70, r: 34 };
+    const PV2 = { cx: 404, cy: 70, r: 34 };
 
-    function iconPath(key, x, y, size, color, outline) {
-      const scale = size / 24;
+    const nodeFill = dir === 'a'
+      ? (theme === 'dark' ? '#181b22' : '#ffffff')
+      : 'transparent';
+
+    /** Visible outer edge of node circle (stroke sits on radius). */
+    function outerR(r, glow = false) {
+      return r + (dir === 'a' ? 2 + (glow ? 5 : 0) : 0);
+    }
+
+    /** Boundary point on ring when leaving node toward (tx, ty). */
+    function ringOut(cx, cy, r, tx, ty, glow = false) {
+      const R = outerR(r, glow);
+      const dx = tx - cx;
+      const dy = ty - cy;
+      const len = Math.hypot(dx, dy) || 1;
+      return { x: cx + (dx / len) * R, y: cy + (dy / len) * R };
+    }
+
+    /** Boundary point where a line from (fx, fy) meets the ring (approach from outside). */
+    function ringIn(cx, cy, r, fx, fy, glow = false) {
+      const R = outerR(r, glow);
+      const dx = cx - fx;
+      const dy = cy - fy;
+      const len = Math.hypot(dx, dy) || 1;
+      return { x: cx - (dx / len) * R, y: cy - (dy / len) * R };
+    }
+
+    const MASK_NODES = [
+      { ...PV1, glow: true },
+      { ...PV2, glow: true },
+      GRID,
+      { cx: INV.x, cy: INV.y, r: INV.r, glow: true },
+      { cx: HOME.x, cy: HOME.y, r: HOME.r, glow: true },
+      BATT,
+      NONESS,
+      GRIDCT,
+      ...LOADS.map((l) => ({ cx: l.cx, cy: l.cy, r: LR, glow: false })),
+    ];
+    const B_HALO = 26;
+
+    function iconSvg(key, x, y, size, color, outline) {
+      const s = size / 24;
       const d = ICONS[key];
       if (outline) {
-        return `<g transform="translate(${x},${y}) scale(${scale})"><path d="${d}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g>`;
+        return `<g transform="translate(${x},${y}) scale(${s})"><path d="${d}" fill="none" stroke="${color}" stroke-width="1.4" stroke-linejoin="round"/></g>`;
       }
-      return `<g transform="translate(${x},${y}) scale(${scale})"><path d="${d}" fill="${color}"/></g>`;
+      return `<g transform="translate(${x},${y}) scale(${s})"><path d="${d}" fill="${color}"/></g>`;
     }
 
-    function ringNode(cx, cy, r, color, iconKey, id) {
-      const outline = dir === 'b';
-      const fill = dir === 'a' ? palette.surfaceHi : 'none';
-      const stroke = color;
-      const sw = dir === 'a' ? 2 : 1.5;
-      const iconSize = 22;
-      const ix = cx - iconSize / 2;
-      const iy = cy - iconSize / 2 - 1;
-      const glow = dir === 'a'
-        ? `<circle class="node-ring-outer" cx="${cx}" cy="${cy}" r="${r + 4}" fill="none" stroke="${stroke}" stroke-width="1" stroke-opacity="${palette.ring * 0.5}"/>`
+    function flow(d, color, id, dur = '2.4s', bus = false) {
+      const dotR = dir === 'a' ? 4 : 2.5;
+      const cap = bus ? 'flow-bus' : '';
+      const dot = dir === 'a' || id.startsWith('flow-')
+        ? `<circle class="dot-glow" r="${dotR}" fill="${color}"><animateMotion dur="${dur}" repeatCount="indefinite" rotate="auto"><mpath href="#${id}"/></animateMotion></circle>`
         : '';
-      return `<g id="${id}">
-        ${glow}
-        <circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" stroke-opacity="${palette.ring}"/>
-        ${iconPath(iconKey, ix, iy, iconSize, stroke, outline)}
+      return `<path class="flow-track ${cap}" d="${d}" stroke="${color}"/>
+        <path class="flow-active ${cap}" id="${id}" d="${d}" stroke="${color}"/>${dot}`;
+    }
+
+    function statChip(x, y, w, h, lines) {
+      const fill = dir === 'a' ? pal.surfaceHi : pal.surface || (theme === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)');
+      const stroke = dir === 'a' ? 'none' : pal.grid;
+      const sw = dir === 'a' ? 0 : 0.6;
+      return `<g transform="translate(${x},${y})">
+        <rect width="${w}" height="${h}" rx="10" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" stroke-opacity="0.35"/>
+        ${lines.map((ln, i) => `<text x="12" y="${16 + i * 14}" fill="${i === 0 ? pal.text : pal.muted}" font-size="${i === 0 ? 11 : 9}" font-weight="${i === 0 ? 600 : 500}">${ln}</text>`).join('')}
       </g>`;
     }
 
-    function valuePill(x, y, value, unit, label, accent) {
-      const fill = dir === 'a' ? palette.surface : 'none';
+    function pill(x, y, value, unit, label, accent, anchor = 'middle') {
+      const w = Math.max(58, value.length * 7 + 28);
+      const ox = anchor === 'middle' ? x - w / 2 : anchor === 'start' ? x : x - w;
+      const fill = dir === 'a' ? pal.surfaceHi : 'transparent';
       const stroke = dir === 'b' ? accent : 'none';
-      const sw = dir === 'b' ? 1 : 0;
-      const h = 28;
-      const w = Math.max(56, value.length * 7 + 24);
-      return `<g transform="translate(${x - w / 2},${y})">
-        <rect width="${w}" height="${h}" rx="8" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" stroke-opacity="0.25"/>
-        <text x="${w / 2}" y="12" text-anchor="middle" class="value tabular" fill="${palette.text}" font-size="12" font-weight="600">${value}<tspan class="muted" font-size="9" font-weight="500"> ${unit}</tspan></text>
-        ${label ? `<text x="${w / 2}" y="24" text-anchor="middle" class="label" fill="${palette.textMuted}">${label}</text>` : ''}
+      return `<g transform="translate(${ox},${y})">
+        <rect width="${w}" height="26" rx="7" fill="${fill}" stroke="${stroke}" stroke-width="${dir === 'b' ? 0.6 : 0}" stroke-opacity="0.3"/>
+        <text x="${w / 2}" y="11" text-anchor="middle" fill="${pal.text}" font-size="11" font-weight="600" font-variant-numeric="tabular-nums">${value}<tspan fill="${pal.muted}" font-size="9" font-weight="500"> ${unit}</tspan></text>
+        ${label ? `<text x="${w / 2}" y="22" text-anchor="middle" fill="${pal.muted}" font-size="9">${label}</text>` : ''}
       </g>`;
     }
 
-    function loadBubble(l) {
-      const cx = l.x;
-      const cy = l.y;
-      const r = 30;
-      const outline = dir === 'b';
-      const fill = dir === 'a' ? palette.surfaceHi : 'none';
-      const stroke = palette.load;
-      const iconR = 18;
-      const ix = cx - iconR / 2;
-      const iy = cy - iconR / 2;
+    function luminousNode(cx, cy, r, color, icon, id) {
+      const is = 22;
+      return `<g id="${id}">
+        <circle class="node-ring-outer" cx="${cx}" cy="${cy}" r="${r + 5}" fill="none" stroke="${color}" stroke-width="1" stroke-opacity="0.25"/>
+        <circle cx="${cx}" cy="${cy}" r="${r + 3}" fill="${nodeFill}" stroke="none"/>
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="${nodeFill}" stroke="${color}" stroke-width="2" stroke-opacity="0.5"/>
+        ${iconSvg(icon, cx - is / 2, cy - is / 2, is, color, false)}
+      </g>`;
+    }
+
+    function floatTile(cx, cy, color, icon, value, label, id) {
+      const is = 20;
+      return `<g id="${id}">
+        <line x1="${cx - 28}" y1="${cy + 22}" x2="${cx + 28}" y2="${cy + 22}" stroke="${pal.gridLine === 'transparent' ? color : pal.gridLine}" stroke-width="0.5"/>
+        ${iconSvg(icon, cx - is / 2, cy - is / 2 - 4, is, color, true)}
+        <text x="${cx}" y="${cy + 18}" text-anchor="middle" fill="${pal.text}" font-size="11" font-weight="600" font-variant-numeric="tabular-nums">${value}</text>
+        <text x="${cx}" y="${cy + 32}" text-anchor="middle" fill="${pal.muted}" font-size="9">${label}</text>
+      </g>`;
+    }
+
+    function loadNode(l) {
+      if (dir === 'b') {
+        return floatTile(l.cx, l.cy, pal.load, l.icon, `${l.w} W`, l.name, `load-${l.id}`);
+      }
+      const is = 18;
       return `<g id="load-${l.id}">
-        <circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="${dir === 'a' ? 2 : 1.25}" stroke-opacity="${palette.ring}"/>
-        ${iconPath(l.icon, ix, iy, iconR, stroke, outline)}
-        <text x="${cx}" y="${cy + r + 16}" text-anchor="middle" class="value tabular" fill="${palette.text}" font-size="11">${l.w}</text>
-        <text x="${cx}" y="${cy + r + 30}" text-anchor="middle" class="label" fill="${palette.textMuted}">${l.name}</text>
+        <circle cx="${l.cx}" cy="${l.cy}" r="${LR + 2}" fill="${nodeFill}" stroke="none"/>
+        <circle cx="${l.cx}" cy="${l.cy}" r="${LR}" fill="${nodeFill}" stroke="${pal.load}" stroke-width="2" stroke-opacity="0.55"/>
+        ${iconSvg(l.icon, l.cx - is / 2, l.cy - is / 2, is, pal.load, false)}
+        <text x="${l.cx}" y="${l.cy + LR + 14}" text-anchor="middle" fill="${pal.text}" font-size="11" font-weight="600" font-variant-numeric="tabular-nums">${l.w} W</text>
+        <text x="${l.cx}" y="${l.cy + LR + 28}" text-anchor="middle" fill="${pal.muted}" font-size="9">${l.name}</text>
       </g>`;
     }
 
-    function flowPath(d, color, id, dur = '2.4s') {
-      const track = `<path class="flow-track" d="${d}" stroke="${color}"/>`;
-      const active = `<path class="flow-active" id="${id}" d="${d}" stroke="${color}"/>`;
-      const dotR = dir === 'a' ? 4 : 3;
-      const dot = `<circle class="dot-glow" r="${dotR}" fill="${color}">
-        <animateMotion dur="${dur}" repeatCount="indefinite" rotate="auto">
-          <mpath href="#${id}"/>
-        </animateMotion>
-      </circle>`;
-      return track + active + dot;
-    }
+    const flows = [];
+    const labelFloor = 154;
 
-    const ys = LOADS.map((l) => l.y);
-    const trunkTop = Math.min(...ys);
-    const trunkBot = Math.max(...ys);
+    // PV: ring bottom → below labels → merge trunk → inverter top ring
+    const pv1Out = ringOut(PV1.cx, PV1.cy, PV1.r, PV1.cx, labelFloor + 40);
+    const pv2Out = ringOut(PV2.cx, PV2.cy, PV2.r, PV2.cx, labelFloor + 40);
+    flows.push(flow(
+      `M ${pv1Out.x} ${pv1Out.y} L ${pv1Out.x} ${labelFloor} L ${MERGE_X} ${labelFloor}`,
+      pal.solar, 'flow-pv1', '2.2s',
+    ));
+    flows.push(flow(
+      `M ${pv2Out.x} ${pv2Out.y} L ${pv2Out.x} ${labelFloor} L ${MERGE_X} ${labelFloor}`,
+      pal.solar, 'flow-pv2', '2.5s',
+    ));
+    const invTopIn = ringIn(INV.x, INV.y, INV.r, MERGE_X, labelFloor - 60);
+    flows.push(flow(
+      `M ${MERGE_X} ${labelFloor} L ${MERGE_X} ${invTopIn.y - 8} L ${invTopIn.x} ${invTopIn.y}`,
+      pal.solar, 'flow-pv-trunk', '2s',
+    ));
 
-    const flows = LOADS.map((l, i) => {
-      const cy = l.y;
-      const d = `M ${HUB.x + 36} ${HUB.y} C ${BUS_X - 12} ${HUB.y} ${BUS_X} ${(HUB.y + cy) / 2} ${BUS_X} ${cy} C ${(BUS_X + l.x) / 2} ${cy} ${l.x - 48} ${cy} ${l.x - 34} ${cy}`;
-      const dur = `${1.6 + (l.w / 800)}s`;
-      return flowPath(d, palette.load, `flow-${l.id}`, dur);
-    }).join('');
+    const gridOut = ringOut(GRID.cx, GRID.cy, GRID.r, INV.x, INV.y);
+    const invGridIn = ringIn(INV.x, INV.y, INV.r, GRID.cx, GRID.cy);
+    const midGx = (gridOut.x + invGridIn.x) / 2;
+    flows.push(flow(
+      `M ${gridOut.x} ${gridOut.y} C ${midGx} ${gridOut.y} ${midGx} ${invGridIn.y} ${invGridIn.x} ${invGridIn.y}`,
+      pal.grid, 'flow-grid', '3s',
+    ));
 
-    const trunk = `<path class="flow-track" d="M ${HUB.x + 28} ${HUB.y} C ${HUB.x + 70} ${HUB.y} ${BUS_X - 8} ${HUB.y} ${BUS_X} ${HUB.y} L ${BUS_X} ${trunkTop + 8} L ${BUS_X} ${trunkBot - 8}" stroke="${palette.load}"/>
-      <path class="flow-active" id="flow-trunk" d="M ${HUB.x + 28} ${HUB.y} C ${HUB.x + 70} ${HUB.y} ${BUS_X - 8} ${HUB.y} ${BUS_X} ${HUB.y} L ${BUS_X} ${trunkTop + 8} L ${BUS_X} ${trunkBot - 8}" stroke="${palette.load}"/>
-      <circle class="dot-glow" r="4" fill="${palette.load}"><animateMotion dur="2s" repeatCount="indefinite"><mpath href="#flow-trunk"/></animateMotion></circle>`;
+    const invBatOut = ringOut(INV.x, INV.y, INV.r, BATT.cx, BATT.cy);
+    const batTopIn = ringIn(BATT.cx, BATT.cy, BATT.r, INV.x, INV.y);
+    flows.push(flow(
+      `M ${invBatOut.x} ${invBatOut.y} L ${batTopIn.x} ${batTopIn.y}`,
+      pal.battery, 'flow-bat', '2.6s',
+    ));
 
-    const pvFlows = `
-      ${flowPath(`M 300 132 C 320 168 360 200 ${HUB.x} ${HUB.y - 8}`, palette.solar, 'flow-pv1', '2.2s')}
-      ${flowPath(`M 420 132 C 400 168 375 200 ${HUB.x} ${HUB.y - 8}`, palette.solar, 'flow-pv2', '2.5s')}
-      ${flowPath(`M ${HUB.x - 36} ${HUB.y} C 280 ${HUB.y} 180 ${HUB.y} 140 ${HUB.y}`, palette.grid, 'flow-grid', '3s')}
-      ${flowPath(`M ${HUB.x} ${HUB.y + 36} C ${HUB.x} 300 ${HUB.x} 350 ${HUB.x} 354`, palette.battery, 'flow-bat', '2.8s')}
-    `;
+    const invHomeOut = ringOut(INV.x, INV.y, INV.r, HOME.cx, HOME.cy);
+    const homeInvIn = ringIn(HOME.x, HOME.y, HOME.r, INV.x, INV.y);
+    flows.push(flow(
+      `M ${invHomeOut.x} ${invHomeOut.y} L ${homeInvIn.x} ${homeInvIn.y}`,
+      pal.load, 'flow-inv-home', '2s',
+    ));
 
-    const socR = 38;
+    const homeBusOut = ringOut(HOME.x, HOME.y, HOME.r, BUS_X0, BUS_Y);
+    flows.push(flow(
+      `M ${homeBusOut.x} ${homeBusOut.y} C ${homeBusOut.x + 48} ${homeBusOut.y} ${BUS_X0 - 52} ${(HOME.y + BUS_Y) / 2} ${BUS_X0} ${BUS_Y}`,
+      pal.load, 'flow-home-bus', '2.1s',
+    ));
+
+    flows.push(flow(`M ${BUS_X0} ${BUS_Y} L ${BUS_X1} ${BUS_Y}`, pal.load, 'flow-bus', '2.8s', true));
+
+    LOADS.forEach((l) => {
+      const tip = ringIn(l.cx, l.cy, LR, l.cx, BUS_Y);
+      flows.push(flow(`M ${l.cx} ${BUS_Y} L ${tip.x} ${tip.y}`, pal.load, `flow-L${l.id}`, `${1.4 + l.w / 900}s`));
+    });
+
+    const invNeOut = ringOut(INV.x, INV.y, INV.r, NONESS.cx, NONESS.cy);
+    const neIn = ringIn(NONESS.cx, NONESS.cy, NONESS.r, INV.x, INV.y);
+    const midNx = (invNeOut.x + neIn.x) / 2;
+    flows.push(flow(
+      `M ${invNeOut.x} ${invNeOut.y} C ${midNx} ${invNeOut.y + 40} ${midNx + 60} ${neIn.y} ${neIn.x} ${neIn.y}`,
+      pal.grid, 'flow-noness', '2.9s',
+    ));
+
+    const ctOut = ringOut(GRIDCT.cx, GRIDCT.cy, GRIDCT.r, GRID.cx, GRID.cy);
+    const gridCtIn = ringIn(GRID.cx, GRID.cy, GRID.r, GRIDCT.cx, GRIDCT.cy);
+    const midCx = (ctOut.x + gridCtIn.x) / 2;
+    flows.push(flow(
+      `M ${ctOut.x} ${ctOut.y} C ${midCx} ${ctOut.y - 30} ${midCx - 200} ${gridCtIn.y} ${gridCtIn.x} ${gridCtIn.y}`,
+      pal.grid, 'flow-gridct', '3.2s',
+    ));
     const circ = 2 * Math.PI * socR;
     const dash = circ * SOC;
-    const gap = circ - dash;
 
-    const battRing = `<g transform="translate(${HUB.x},392)">
-      <circle r="${socR + 8}" fill="${palette.surface}" stroke="none"/>
-      <circle r="${socR + 6}" fill="none" stroke="${palette.battery}" stroke-width="2" stroke-opacity="0.2"/>
-      <circle r="${socR}" fill="none" stroke="${palette.battery}" stroke-width="4" stroke-linecap="round"
-        stroke-dasharray="${dash} ${gap}" transform="rotate(-90)"/>
-      <text text-anchor="middle" y="-2" class="value tabular" fill="${palette.text}" font-size="14" font-weight="700">${Math.round(SOC*100)}%</text>
-      <text text-anchor="middle" y="14" class="label" fill="${palette.textMuted}">Battery</text>
-      <text text-anchor="middle" y="52" class="value tabular" fill="${palette.battery}" font-size="11">−500 W</text>
-    </g>`;
+    let nodes = '';
+    let labels = '';
 
-    const svg = `
+    labels += statChip(20, 18, 108, 40, ['Autarky 70%', 'Ratio 100%']);
+
+    if (dir === 'a') {
+      nodes += luminousNode(PV1.cx, PV1.cy, PV1.r, pal.solar, 'solar', 'pv1');
+      nodes += luminousNode(PV2.cx, PV2.cy, PV2.r, pal.solar, 'solar', 'pv2');
+      labels += pill(PV1.cx, 118, '2.00', 'kW', 'PV 1', pal.solar);
+      labels += pill(PV2.cx, 118, '1.50', 'kW', 'PV 2', pal.solar);
+      labels += pill(MERGE_X + 56, 132, '3.50', 'kW', 'Solar total', pal.solar, 'start');
+      nodes += luminousNode(GRID.cx, GRID.cy, GRID.r, pal.grid, 'grid', 'grid');
+      labels += pill(112, 292, '100', 'W', 'Grid import', pal.grid);
+      nodes += luminousNode(INV.x, INV.y, INV.r, pal.inv, 'inv', 'inv');
+      labels += pill(INV.x + INV.r + 54, INV.y + 52, '4.50', 'kW', 'Inverter', pal.inv, 'start');
+      nodes += luminousNode(HOME.x, HOME.y, HOME.r, pal.load, 'home', 'home');
+      nodes += `<g id="battery" transform="translate(${BATT.cx},${BATT.cy})">
+        <circle r="${socR + 8}" fill="${nodeFill}" stroke="none"/>
+        <circle r="${socR}" fill="${nodeFill}" stroke="none"/>
+        <circle r="${socR}" fill="none" stroke="${pal.battery}" stroke-width="4" stroke-linecap="round" stroke-dasharray="${dash} ${circ - dash}" transform="rotate(-90)"/>
+        <text text-anchor="middle" y="-2" fill="${pal.text}" font-size="13" font-weight="700">${Math.round(SOC * 100)}%</text>
+        <text text-anchor="middle" y="14" fill="${pal.muted}" font-size="9">Battery</text>
+        <text text-anchor="middle" y="50" fill="${pal.battery}" font-size="11" font-weight="600">−500 W</text>
+      </g>`;
+      nodes += luminousNode(NONESS.cx, NONESS.cy, NONESS.r, pal.grid, 'homeOut', 'noness');
+      labels += pill(752, 458, '−100', 'W', 'Non-essential', pal.grid);
+      nodes += luminousNode(GRIDCT.cx, GRIDCT.cy, GRIDCT.r, pal.grid, 'grid', 'gridct');
+      labels += pill(842, 458, '0', 'W', 'Grid CT', pal.grid);
+    } else {
+      const gridBg = Array.from({ length: 24 }, (_, i) =>
+        `<line x1="${i * 40}" y1="0" x2="${i * 40}" y2="520" stroke="${pal.gridLine}"/>`
+      ).join('') + Array.from({ length: 14 }, (_, i) =>
+        `<line x1="0" y1="${i * 40}" x2="940" y2="${i * 40}" stroke="${pal.gridLine}"/>`
+      ).join('');
+      nodes += `<g opacity="0.9">${gridBg}</g>`;
+      nodes += floatTile(PV1.cx, PV1.cy, pal.solar, 'solar', '2.00 kW', 'PV 1', 'pv1');
+      nodes += floatTile(PV2.cx, PV2.cy, pal.solar, 'solar', '1.50 kW', 'PV 2', 'pv2');
+      labels += pill(MERGE_X + 50, 128, '3.50', 'kW', 'Solar Σ', pal.solar, 'start');
+      nodes += floatTile(112, 246, pal.grid, 'grid', '100 W', 'Grid', 'grid');
+      nodes += floatTile(INV.x, INV.y, pal.inv, 'inv', '4.50 kW', 'Inverter', 'inv');
+      nodes += floatTile(HOME.x, HOME.y, pal.load, 'home', 'Essential', 'Home', 'home');
+      nodes += floatTile(INV.x, 388, pal.battery, 'battery', `${Math.round(SOC * 100)}%`, 'Battery −500 W', 'bat');
+      nodes += floatTile(752, 418, pal.grid, 'homeOut', '−100 W', 'Non-essential', 'noness');
+      nodes += floatTile(842, 418, pal.grid, 'grid', '0 W', 'Grid CT', 'gridct');
+    }
+
+    const loads = LOADS.map(loadNode).join('');
+
+    const maskHoles = dir === 'a'
+      ? MASK_NODES.map((n) => {
+          const dotPad = dir === 'a' ? 5 : 3;
+          return `<circle cx="${n.cx}" cy="${n.cy}" r="${outerR(n.r, n.glow) + dotPad}" fill="black"/>`;
+        }).join('')
+      : [
+          ...MASK_NODES.map((n) => `<circle cx="${n.cx}" cy="${n.cy}" r="${B_HALO}" fill="black"/>`),
+          ...LOADS.map((l) => `<circle cx="${l.cx}" cy="${l.cy}" r="${B_HALO}" fill="black"/>`),
+        ].join('');
+
+    document.getElementById('diagram').innerHTML = `
       <defs>
-        <filter id="dotGlow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="2.5" result="b"/>
+        <filter id="dotGlow" x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation="2.2" result="b"/>
           <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
+        <mask id="flow-ring-mask" maskUnits="userSpaceOnUse">
+          <rect width="940" height="520" fill="white"/>
+          ${maskHoles}
+        </mask>
       </defs>
-
-      <!-- PV -->
-      ${ringNode(300, 88, 34, palette.solar, 'solar', 'node-pv1')}
-      ${valuePill(300, 130, '2.00', 'kW', 'PV 1', palette.solar)}
-      ${ringNode(420, 88, 34, palette.solar, 'solar', 'node-pv2')}
-      ${valuePill(420, 130, '1.50', 'kW', 'PV 2', palette.solar)}
-      ${valuePill(360, 168, '3.50', 'kW', 'Solar total', palette.solar)}
-
-      <!-- Grid left -->
-      ${ringNode(108, 248, 36, palette.grid, 'grid', 'node-grid')}
-      ${valuePill(108, 296, '100', 'W', 'Grid import', palette.grid)}
-      <text x="108" y="332" text-anchor="middle" class="label" fill="${palette.textMuted}">Autarky 70%</text>
-
-      <!-- Inverter centre -->
-      ${ringNode(HUB.x, HUB.y, 40, palette.inv, 'inv', 'node-inv')}
-      ${valuePill(HUB.x, HUB.y + 58, '4.50', 'kW', 'Inverter', palette.inv)}
-
-      <!-- Home hub + loads -->
-      ${ringNode(532, 248, 28, palette.load, 'home', 'node-home')}
-      ${trunk}
-      ${flows}
-      ${LOADS.map(loadBubble).join('')}
-
-      <!-- Battery bottom -->
-      ${battRing}
-
-      <!-- Bottom-right: non-essential + grid meter -->
-      ${ringNode(780, 420, 32, palette.grid, 'homeOut', 'node-noness')}
-      ${valuePill(780, 462, '−100', 'W', 'Non-essential', palette.grid)}
-      ${ringNode(870, 420, 32, palette.grid, 'grid', 'node-grid2')}
-      ${valuePill(870, 462, '0', 'W', 'Grid CT', palette.grid)}
-
-      ${pvFlows}
-    `;
-
-    document.getElementById('diagram').innerHTML = svg;
-    document.getElementById('diagram').style.color = palette.text;
+      <g id="layer-flows" mask="url(#flow-ring-mask)">${flows.join('')}</g>
+      <g id="layer-labels">${labels}</g>
+      <g id="layer-nodes">${nodes}</g>
+      <g id="layer-loads">${loads}</g>`;
+    document.getElementById('diagram').style.color = pal.text;
   </script>
 </body>
 </html>
