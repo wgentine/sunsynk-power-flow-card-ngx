@@ -61,10 +61,8 @@ export const renderLoadElements = (
 		dynamic_colour,
 	} = config.load;
 
-	const showCompactSideLoads =
-		config.wide || (!config.wide && [1, 2, 3].includes(config.solar.mppts))
-			? 'inline'
-			: 'none';
+	const showCompactExtendedLoads =
+		config.wide || (!config.wide && [1, 2, 3].includes(config.solar.mppts));
 	const compactExtCol = (col: number) => COMPACT_LOAD_COL_X[col];
 	const compactLoadCell = (
 		loadIndex: 5 | 6 | 7 | 8,
@@ -127,7 +125,7 @@ export const renderLoadElements = (
 			8: 'essential_load8_extra',
 		};
 		const align = col >= 2 ? 'right-align' : 'left-align';
-		return html`
+		return svg`<g id="essential-load-${loadIndex}">
 			<rect
 				id="es-load${loadIndex}"
 				x="${rx}"
@@ -139,7 +137,7 @@ export const renderLoadElements = (
 				fill="none"
 				stroke="${colours[loadIndex]}"
 				pointer-events="all"
-				display="${additionalLoad >= loadIndex ? 'inline' : 'none'}"
+				display="${additionalLoad >= loadIndex ? '' : 'none'}"
 			/>
 			${renderText(
 				`es-load${loadIndex}`,
@@ -150,7 +148,7 @@ export const renderLoadElements = (
 				colours[loadIndex],
 				names[loadIndex],
 			)}
-			<g display="${additionalLoad >= loadIndex ? 'inline' : 'none'}">
+			<g display="${additionalLoad >= loadIndex ? '' : 'none'}">
 				${renderIcon(
 					switches[loadIndex],
 					icons[loadIndex],
@@ -181,7 +179,7 @@ export const renderLoadElements = (
 				states[loadIndex]?.toPowerString(auto_scale, decimalPlaces),
 				(e) => Utils.handlePopup(e, config.entities[entities[loadIndex]]),
 			)}
-		`;
+		</g>`;
 	};
 
 	return html`
@@ -656,15 +654,12 @@ export const renderLoadElements = (
 					data.stateEssentialLoad4?.toPowerString(auto_scale, decimalPlaces),
 					(e) => Utils.handlePopup(e, config.entities.essential_load4),
 				)}
-			</svg>
-			<svg
-				id="Esential-Load-Extended"
-				style="overflow: visible; display: ${
-					additionalLoad >= 5 ? showCompactSideLoads : 'none'
-				};"
-			>
-				${compactLoadCell(5, 2, 0)} ${compactLoadCell(6, 2, 1)}
-				${compactLoadCell(7, 3, 0)} ${compactLoadCell(8, 3, 1)}
+				${
+					additionalLoad >= 5 && showCompactExtendedLoads
+						? svg`${compactLoadCell(5, 2, 0)} ${compactLoadCell(6, 2, 1)}
+								${compactLoadCell(7, 3, 0)} ${compactLoadCell(8, 3, 1)}`
+						: ''
+				}
 			</svg>
 			${renderText(
 				'daily_load',

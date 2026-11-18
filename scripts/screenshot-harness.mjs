@@ -1,6 +1,8 @@
 /**
  * Renders 8 essential loads per card style (4×2 grid, viewBox extended right).
+ * Rebuilds dist first so harness matches source (stale dist clip loads 5–8).
  */
+import { execSync } from 'node:child_process';
 import { chromium } from 'playwright';
 import http from 'node:http';
 import fs from 'node:fs';
@@ -11,6 +13,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
 const artifacts = '/opt/cursor/artifacts';
 fs.mkdirSync(artifacts, { recursive: true });
+
+execSync('npm run build', { cwd: root, stdio: 'inherit' });
 
 function sensor(id, state, unit = 'W') {
   return {
@@ -143,7 +147,7 @@ const pageTemplate = (configJson, statesJson) => `<!DOCTYPE html>
   <meta charset="utf-8" />
   <style>
     body { margin: 0; background: #111; }
-    #wrap { width: 620px; height: 500px; padding: 8px; }
+    #wrap { width: 600px; height: 500px; padding: 8px; }
     sunsynk-power-flow-card { display: block; width: 100%; height: 100%; --ha-card-background: #1e1e1e; }
   </style>
 </head>
@@ -194,7 +198,7 @@ const port = server.address().port;
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 640, height: 540 } });
 
-const wrapWidthByStyle = { lite: 620, compact: 620, full: 740 };
+const wrapWidthByStyle = { lite: 600, compact: 600, full: 960 };
 for (const style of styles) {
   const wrapW = wrapWidthByStyle[style] ?? 620;
   await page.setViewportSize({
@@ -208,11 +212,30 @@ for (const style of styles) {
     el.style.width = `${w}px`;
   }, wrapW);
   await page
-    .locator('sunsynk-power-flow-card')
-    .locator('svg')
-    .first()
+    .locator('sunsynk-power-flow-card .container > svg')
     .waitFor({ state: 'attached', timeout: 20000 });
-  await page.waitForTimeout(800);
+  const viewBox = await page
+    .locator('sunsynk-power-flow-card .container > svg')
+    .getAttribute('viewBox');
+  const width = viewBox ? Number(viewBox.split(/\s+/)[2]) : 0;
+  if (style !== 'full' && width < 560) {
+    throw new Error(
+      `${style}: viewBox width ${width} too narrow (expected ~578 for 8 loads); dist may be stale`,
+    );
+  }
+  const loadMetrics = await page.evaluate(() => {
+    const root = document
+      .querySelector('sunsynk-power-flow-card')
+      ?.shadowRoot?.querySelector('rect#es-load8');
+    const r = root?.getBoundingClientRect();
+    return { found: !!root, width: r?.width ?? 0, height: r?.height ?? 0 };
+  });
+  if (!loadMetrics.found || loadMetrics.width < 8) {
+    throw new Error(
+      `${style}: es-load8 missing or not painted (width=${loadMetrics.width})`,
+    );
+  }
+  await page.waitForTimeout(400);
   const filename = `loads8-grid-${style}.png`;
   const out = path.join(artifacts, filename);
   await page.locator('#wrap').screenshot({ path: out });

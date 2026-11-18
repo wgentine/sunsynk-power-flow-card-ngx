@@ -63,8 +63,7 @@ export const renderLoadElements = (
 		dynamic_colour,
 	} = config.load;
 
-	const showSideLoads =
-		config.wide || !config.load.show_aux ? 'inline' : 'none';
+	const showExtendedLoads = config.wide || !config.load.show_aux;
 	const fullLoadCell = (loadIndex: 5 | 6 | 7 | 8, col: number, row: number) => {
 		const rx = FULL_LOAD_COL_X[col];
 		const ry = FULL_LOAD_ROW_Y[row];
@@ -122,7 +121,7 @@ export const renderLoadElements = (
 			7: 'essential_load7_extra',
 			8: 'essential_load8_extra',
 		} as const;
-		return html`
+		return svg`<g id="essential-load-${loadIndex}">
 			<rect
 				id="es-load${loadIndex}"
 				x="${rx}"
@@ -134,7 +133,7 @@ export const renderLoadElements = (
 				fill="none"
 				stroke="${colours[loadIndex]}"
 				pointer-events="all"
-				display="${additionalLoad >= loadIndex ? 'inline' : 'none'}"
+				display="${additionalLoad >= loadIndex ? '' : 'none'}"
 			/>
 			${renderText(
 				`ess-load${loadIndex}`,
@@ -145,7 +144,7 @@ export const renderLoadElements = (
 				colours[loadIndex],
 				names[loadIndex],
 			)}
-			<g display="${additionalLoad >= loadIndex ? 'inline' : 'none'}">
+			<g display="${additionalLoad >= loadIndex ? '' : 'none'}">
 				${renderIcon(
 					switches[loadIndex],
 					icons[loadIndex],
@@ -178,7 +177,7 @@ export const renderLoadElements = (
 				states[loadIndex].toPowerString(auto_scale, decimalPlaces),
 				(e) => Utils.handlePopup(e, config.entities[entities[loadIndex]]),
 			)}
-		`;
+		</g>`;
 	};
 
 	return html`
@@ -269,14 +268,14 @@ export const renderLoadElements = (
 					!showAux && [3, 4, 5, 6, 7, 8].includes(additionalLoad) ? '' : 'none'
 				}"
 			/>
-			<g
-				id="essential-load-extended"
-				style="display: ${additionalLoad >= 5 ? showSideLoads : 'none'};"
-			>
-				${fullLoadCell(5, 2, 0)} ${fullLoadCell(6, 2, 1)}
-				${fullLoadCell(7, 3, 0)} ${fullLoadCell(8, 3, 1)}
-			</g>
-
+			${
+				additionalLoad >= 5 && showExtendedLoads
+					? svg`<g id="essential-load-extended">
+							${fullLoadCell(5, 2, 0)} ${fullLoadCell(6, 2, 1)}
+							${fullLoadCell(7, 3, 0)} ${fullLoadCell(8, 3, 1)}
+						</g>`
+					: ''
+			}
 			${renderText(
 				'essential_name',
 				411,
