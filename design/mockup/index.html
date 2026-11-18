@@ -99,28 +99,28 @@
 
     const INV = { x: 388, y: 238, r: 40 };
     const HOME = { x: 520, y: 238, r: 26 };
-    const BUS_Y = 198;
+    const BUS_Y = INV.y;
     const COL0 = 588;
     const COL_SP = 88;
-    const BUS_X0 = 558;
+    const LOAD_ROW_DY = 72;
     const BUS_X1 = COL0 + COL_SP * 3;
     const MERGE_X = INV.x;
     const PV_CORRIDOR_Y = 134;
 
     const LOADS = [
-      { id: 1, cx: COL0, cy: 112, w: 350, icon: 'ev', name: 'EV charger' },
-      { id: 2, cx: COL0 + COL_SP, cy: 112, w: 400, icon: 'hw', name: 'Hot water' },
-      { id: 5, cx: COL0 + COL_SP * 2, cy: 112, w: 550, icon: 'pool', name: 'Pool' },
-      { id: 7, cx: COL0 + COL_SP * 3, cy: 112, w: 650, icon: 'garage', name: 'Garage' },
-      { id: 3, cx: COL0, cy: 284, w: 450, icon: 'kitchen', name: 'Kitchen' },
-      { id: 4, cx: COL0 + COL_SP, cy: 284, w: 500, icon: 'office', name: 'Office' },
-      { id: 6, cx: COL0 + COL_SP * 2, cy: 284, w: 600, icon: 'shed', name: 'Shed' },
-      { id: 8, cx: COL0 + COL_SP * 3, cy: 284, w: 700, icon: 'shop', name: 'Workshop' },
+      { id: 1, cx: COL0, cy: BUS_Y - LOAD_ROW_DY, w: 350, icon: 'ev', name: 'EV charger' },
+      { id: 2, cx: COL0 + COL_SP, cy: BUS_Y - LOAD_ROW_DY, w: 400, icon: 'hw', name: 'Hot water' },
+      { id: 5, cx: COL0 + COL_SP * 2, cy: BUS_Y - LOAD_ROW_DY, w: 550, icon: 'pool', name: 'Pool' },
+      { id: 7, cx: COL0 + COL_SP * 3, cy: BUS_Y - LOAD_ROW_DY, w: 650, icon: 'garage', name: 'Garage' },
+      { id: 3, cx: COL0, cy: BUS_Y + LOAD_ROW_DY, w: 450, icon: 'kitchen', name: 'Kitchen' },
+      { id: 4, cx: COL0 + COL_SP, cy: BUS_Y + LOAD_ROW_DY, w: 500, icon: 'office', name: 'Office' },
+      { id: 6, cx: COL0 + COL_SP * 2, cy: BUS_Y + LOAD_ROW_DY, w: 600, icon: 'shed', name: 'Shed' },
+      { id: 8, cx: COL0 + COL_SP * 3, cy: BUS_Y + LOAD_ROW_DY, w: 700, icon: 'shop', name: 'Workshop' },
     ];
     const LR = 28;
     const SOC = 0.75;
-    const GRID = { cx: 92, cy: 228, r: 34 };
-    const GRIDCT = { cx: 168, cy: 228, r: 22 };
+    const GRID = { cx: 92, cy: INV.y, r: 34 };
+    const GRIDCT = { cx: 168, cy: INV.y, r: 22 };
     const NONESS = { cx: 92, cy: 318, r: 28 };
     const socR = 36;
     const BATT = { cx: INV.x, cy: 388, r: socR + 2 };
@@ -325,8 +325,9 @@
     addFlow(`M ${invEast.x} ${invEast.y} L ${homeWest.x} ${homeWest.y}`, pal.load, 'flow-inv-home', '2s', false, false, { from: 'inv', to: 'home' });
 
     const homeEast = ringAt(HOME.x, HOME.y, HOME.r, 0);
+    const BUS_X0 = homeEast.x;
     addFlow(
-      `M ${homeEast.x} ${homeEast.y} C ${homeEast.x + 56} ${homeEast.y} ${BUS_X0 - 36} ${BUS_Y} ${BUS_X0} ${BUS_Y} L ${BUS_X1} ${BUS_Y}`,
+      `M ${homeEast.x} ${homeEast.y} L ${BUS_X1} ${BUS_Y}`,
       pal.load, 'flow-home-bus', '2.1s', true, false, { from: 'home', to: 'bus-end' },
     );
 

@@ -172,6 +172,22 @@ export async function auditMockupGeometry(page) {
         }
       }
 
+      function xReversesAlongPath(pts) {
+        const tolY = 8;
+        let runSign = 0;
+        for (let i = 1; i < pts.length; i++) {
+          const dx = pts[i].x - pts[i - 1].x;
+          const dy = pts[i].y - pts[i - 1].y;
+          if (Math.abs(dy) > tolY && Math.abs(dx) < 6) continue;
+          if (Math.abs(dx) < 1) continue;
+          const s = Math.sign(dx);
+          if (runSign === 0) runSign = s;
+          else if (s !== runSign) return true;
+        }
+        return false;
+      }
+
+      const xExempt = new Set(['flow-pv1', 'flow-pv2', 'flow-pv-trunk', 'flow-bat', 'flow-noness']);
       for (const el of paths) {
         let len = 0;
         try {
@@ -187,6 +203,13 @@ export async function auditMockupGeometry(page) {
         }
         if (!snapsToNetwork(end.x, end.y)) {
           violations.push({ kind: 'float-end', path: el.id, at: { x: end.x, y: end.y } });
+        }
+        const pts = samplePath(el, 4);
+        const ys = pts.map((p) => p.y);
+        const ySpread = Math.max(...ys) - Math.min(...ys);
+        const isLoadStub = el.id.startsWith('flow-L');
+        if (!xExempt.has(el.id) && !isLoadStub && ySpread <= 6 && xReversesAlongPath(pts)) {
+          violations.push({ kind: 'path-x-reverse', path: el.id });
         }
       }
     }
